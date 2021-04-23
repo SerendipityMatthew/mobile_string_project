@@ -214,13 +214,27 @@ def parse_module_string(module_name: str):
 
 
 def module_name_cell_style():
-    style = xlwt.XFStyle()
+    style = xlwt.easyxf('font:height 720;')
     font = xlwt.Font()
     font.blod = True
+    font.height = 20 * 20
     style.font = font
     alignment = xlwt.Alignment()
     alignment.horz = xlwt.Alignment.HORZ_CENTER
     alignment.vert = xlwt.Alignment.VERT_CENTER
+    style.alignment = alignment
+    return style
+
+
+def other_cell_style():
+    style = xlwt.easyxf('font:height 720;')
+    font = xlwt.Font()
+    font.blod = True
+    font.height = 20 * 20
+    style.font = font
+    alignment = xlwt.Alignment()
+    alignment.horz = xlwt.Alignment.HORZ_LEFT
+    # alignment.vert = xlwt.Alignment.VERT_CENTER
     style.alignment = alignment
     return style
 
@@ -247,11 +261,21 @@ def write_excel_xls(path, sheet_name, value):
         print("========= end = " + str(end))
         cell_style = module_name_cell_style()
         sheet.write_merge(count, end - 1, 0, 0, key, style=cell_style)
-
+        for col_index in range(12):
+            sheet.col(col_index).width = 256 * 40
+            if col_index == 0:
+                continue
+            sheet.col(col_index).height = 40 * 40
+        other_style = other_cell_style()
         for index in range(count, end):
             string = single_module_name_list[index - count]
             print("index = " + str(index))
-            sheet.write(index, 1, string.android_id)
+            for col_index in range(12):
+                sheet.col(col_index).width = 256 * 40
+                if col_index == 0:
+                    continue
+                sheet.col(col_index).height = 40 * 40
+            sheet.write(index, 1, string.android_id, style=other_style)
             sheet.write(index, 2, string.ios_id)
             sheet.write(index, 3, string.simplified_chinese)
             sheet.write(index, 4, string.default_lang)
