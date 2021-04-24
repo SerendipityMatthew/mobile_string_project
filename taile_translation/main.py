@@ -326,6 +326,7 @@ def sort_string_list(all_string):
     taileStringHeader = TaileString(
         module_name="功能模块",
         function_desc="功能描述",
+        page_start="启动页面",
         android_id="android 资源id",
         ios_id="ios 资源id",
         simplified_chinese="中文",
@@ -662,10 +663,10 @@ def parse_string():
             login_string_all_list.extend(login_listB)
 
         if correct_string.module_name.__eq__("忘记/修改密码"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-account", False)
-            forgot_string_all_list.extend(list)
+            forgot_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("首页"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
@@ -678,27 +679,27 @@ def parse_string():
             first_page_string_all_list.extend(listB)
 
         if correct_string.module_name.__eq__("家庭管理"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-device", False)
-            home_management_string_all_list.extend(list)
+            home_management_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("智能"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-scene", False)
-            intelligence_string_all_list.extend(list)
+            intelligence_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("我的"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-me", False)
-            about_string_all_list.extend(list)
+            about_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("个人设置"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-me", False)
-            mine_setting_string_all_list.extend(list)
+            mine_setting_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("设置"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
@@ -713,26 +714,26 @@ def parse_string():
             setting_string_all_list.extend(listB)
             setting_string_all_list.extend(listC)
         if correct_string.module_name.__eq__("消息中心"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-message", False)
-            message_center_string_all_list.extend(list)
+            message_center_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("问题反馈"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "ilop-component", False)
-            feedback_string_all_list.extend(list)
+            feedback_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("设备共享"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-share", False)
-            device_share_string_all_list.extend(list)
+            device_share_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("使用帮助"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-me", False)
-            faq_string_all_list.extend(list)
+            faq_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("关于我们"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
@@ -752,10 +753,10 @@ def parse_string():
             add_device_string_all_list.extend(listA)
             add_device_string_all_list.extend(listB)
         if correct_string.module_name.__eq__("虚拟按钮"):
-            list = cross_compare_the_then_get_one(android_code_string_list,
+            listA = cross_compare_the_then_get_one(android_code_string_list,
                                                   correct_string,
                                                   "page-scene", False)
-            page_scene_string_all_list.extend(list)
+            page_scene_string_all_list.extend(listA)
 
     for hello in service_protocol_all_list:
         print("hello = " + str(hello.page_start))
@@ -768,13 +769,22 @@ def parse_string():
     all_list.extend(home_management_string_all_list)
     all_list.extend(intelligence_string_all_list)
     all_list.extend(about_string_all_list)
+    all_list.extend(mine_setting_string_all_list)
+    all_list.extend(setting_string_all_list)
+    all_list.extend(message_center_string_all_list)
+    all_list.extend(feedback_string_all_list)
+    all_list.extend(device_share_string_all_list)
+    all_list.extend(faq_string_all_list)
+    all_list.extend(about_company_string_all_list)
+    all_list.extend(add_device_string_all_list)
+    all_list.extend(page_scene_string_all_list)
     write_excel_xls("hello_translation.xlsx", "taile", sort_string_list(all_list))
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # read_all_strings_generate_excel(
-    # parse_string()
-    correct_string_list = read_final_multination_string_company_excel("taile")
-    for xxx in correct_string_list:
-        print(xxx)
+    parse_string()
+    # correct_string_list = read_final_multination_string_company_excel("taile")
+    # for xxx in correct_string_list:
+    #     print(xxx)
