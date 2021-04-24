@@ -396,6 +396,24 @@ def get_merged_cells_value(sheet: Sheet, row_index, col_index):
 
 """
 从 correct_translation.xlsx 文件里读出所有的字符串
+服务协议  ----> mxapp_smartplus_android/src
+注册功能   ----> page-account
+登录功能   ----> ilop-component
+忘记/修改密码   ---> page-account
+首页     ----> ilop-componen  page-device
+家庭管理  ----> page-device
+智能   -----> page-scene
+我的   -----> page-me
+个人设置 ----> page-me
+设置    ---> page-ota page-me ilop-component
+消息中心  ---->page-message
+问题反馈    --->ilop-componen
+设备共享   -----> page-share
+使用帮助   ---->   page-me
+关于我们    ----> page-me  ilop-component
+添加设备   ----> page-device-add  ilop-component
+虚拟按钮   ----> page-scene
+设备详情
 """
 
 
@@ -412,14 +430,15 @@ def read_multination_string_company_excel():
             english_us = ""
             for col_index in range(worksheet.ncols):
                 # print(worksheet.cell_value(row_index, col_index))
+                cell_value = worksheet.cell_value(row_index, col_index)
                 if col_index == 1:
                     module_name = get_merged_cells_value(worksheet, row_index, col_index)
                 if col_index == 2:
-                    function_desc = worksheet.cell_value(row_index, col_index)
+                    function_desc = cell_value
                 if col_index == 4:
-                    simplified_chinese = worksheet.cell_value(row_index, col_index)
+                    simplified_chinese = cell_value
                 if col_index == 5:
-                    english_us = worksheet.cell_value(row_index, col_index)
+                    english_us = cell_value
 
             taileString = TaileString(module_name=module_name, function_desc=function_desc,
                                       simplified_chinese=simplified_chinese, english_us=english_us)
@@ -452,5 +471,3 @@ if __name__ == '__main__':
                 if str(code_string.english_us).__eq__(str(correct_string.english_us)):
                     code_string.function_desc = correct_string.function_desc
                     print(code_string)
-
-
