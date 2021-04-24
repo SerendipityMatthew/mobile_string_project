@@ -29,3 +29,14 @@ class TaileString:
                 value = ""
             string = string + key + " == " + value + "\n"
         return string
+
+    """
+     先 根据 module_name 排序, 然后再根据 page_start 字段排序
+    """
+    def __lt__(self, other):
+        if self.module_name < other.module_name:
+            return True
+        if self.module_name == other.module_name:
+            if self.page_start < other.page_start:
+                return True
+            return False

@@ -320,6 +320,12 @@ def read_all_strings_from_android_xml():
     return all_string
 
 
+def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
+    if taile_str1.page_start > taile_str2.page_start:
+        return True
+    return False
+
+
 def sort_string_list(all_string):
     all_string_dict = {}
     taileStringHeaderlist = []
@@ -348,14 +354,21 @@ def sort_string_list(all_string):
     """
     # write_excel_xls("translation.xlsx", "taile", all_string_dict)
 
+    """
+    排序字段  模块名称 ---> 启动页面
+    
+    """
+    from operator import attrgetter
+
     for module_name in module_name_list:
         page_start_string_list = []
         print("sort_string_list: module_name =" + module_name)
+        page_start_dict = {}
         for index in range(all_string.__len__()):
             if all_string[index].module_name.__eq__(module_name):
                 print("mmmmmmmm " + all_string[index].__str__())
                 page_start_string_list.append(all_string[index])
-
+        page_start_string_list.sort()
         all_string_dict[module_name] = page_start_string_list
     return all_string_dict
 
@@ -464,9 +477,11 @@ def read_multination_string_company_excel(sheetName: str):
 
         return multination_string_list
 
+
 """
 读取最终版本的 字符串的excel 文件, 他有最全的字段
 """
+
 
 def read_final_multination_string_company_excel(sheetName: str):
     with xlrd.open_workbook(final_multination_string_excel_file) as excel_workbook:
@@ -524,16 +539,15 @@ def read_final_multination_string_company_excel(sheetName: str):
                     japan = cell_value
 
             taileString = TaileString(module_name=module_name, function_desc=function_desc,
-                                      page_start=page_start,default_lang=default_lang,
+                                      page_start=page_start, default_lang=default_lang,
                                       android_id=android_id, ios_id=ios_id,
                                       germany=germany, french=french, russia=russia,
-                                      korean=korean, japan=japan,spanish=spanish,
+                                      korean=korean, japan=japan, spanish=spanish,
                                       simplified_chinese=simplified_chinese, english_us=english_us)
             multination_string_list.append(taileString)
 
         for taileString in multination_string_list:
             print(taileString)
-
 
         return multination_string_list
 
@@ -664,8 +678,8 @@ def parse_string():
 
         if correct_string.module_name.__eq__("忘记/修改密码"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-account", False)
+                                                   correct_string,
+                                                   "page-account", False)
             forgot_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("首页"):
@@ -680,25 +694,25 @@ def parse_string():
 
         if correct_string.module_name.__eq__("家庭管理"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-device", False)
+                                                   correct_string,
+                                                   "page-device", False)
             home_management_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("智能"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-scene", False)
+                                                   correct_string,
+                                                   "page-scene", False)
             intelligence_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("我的"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-me", False)
+                                                   correct_string,
+                                                   "page-me", False)
             about_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("个人设置"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-me", False)
+                                                   correct_string,
+                                                   "page-me", False)
             mine_setting_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("设置"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
@@ -715,24 +729,24 @@ def parse_string():
             setting_string_all_list.extend(listC)
         if correct_string.module_name.__eq__("消息中心"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-message", False)
+                                                   correct_string,
+                                                   "page-message", False)
             message_center_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("问题反馈"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "ilop-component", False)
+                                                   correct_string,
+                                                   "ilop-component", False)
             feedback_string_all_list.extend(listA)
 
         if correct_string.module_name.__eq__("设备共享"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-share", False)
+                                                   correct_string,
+                                                   "page-share", False)
             device_share_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("使用帮助"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-me", False)
+                                                   correct_string,
+                                                   "page-me", False)
             faq_string_all_list.extend(listA)
         if correct_string.module_name.__eq__("关于我们"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
@@ -754,8 +768,8 @@ def parse_string():
             add_device_string_all_list.extend(listB)
         if correct_string.module_name.__eq__("虚拟按钮"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                  correct_string,
-                                                  "page-scene", False)
+                                                   correct_string,
+                                                   "page-scene", False)
             page_scene_string_all_list.extend(listA)
 
     for hello in service_protocol_all_list:
