@@ -573,7 +573,7 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                 .replace("《", "") \
                 .replace("？", "?") \
                 .replace("\n", "") \
-                .replace(" ", "") \
+                .replace("  ", "") \
                 .replace("》", "") \
                 .replace("\n", "") \
                 .replace("\t", "") \
@@ -583,7 +583,7 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                 .replace("》", "") \
                 .replace("？", "?") \
                 .replace("\n", "") \
-                .replace(" ", "") \
+                .replace("  ", "") \
                 .replace("\t", "") \
                 .replace("\n", "") \
                 .strip().lower()
@@ -607,19 +607,18 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                     print("code_string = " + str(code_string))
                     print("correct_string = " + str(correct_string))
                     string_list.append(code_string)
-
-            """
-             长句子, 比较第一句话是否相同
-            """
-            if modify_correct_english.__contains__("."):
-                correct_first_line = modify_correct_english.split(".")[0].strip()
-                code_first_line = modify_code_english.split(".")[0].strip()
-
-                if code_first_line.__eq__(correct_first_line):
-                    code_string.page_start = correct_string.module_name
-                    code_string.function_desc = correct_string.function_desc
-                    print("code_string = " + str(code_string))
-                    string_list.append(code_string)
+            else:
+                """
+                 长句子, 比较第一句话是否相同
+                """
+                if modify_correct_english.__contains__("."):
+                    correct_first_line = modify_correct_english.split(".")[0].strip()
+                    code_first_line = modify_code_english.split(".")[0].strip()
+                    if code_first_line.__eq__(correct_first_line):
+                        code_string.page_start = correct_string.module_name
+                        code_string.function_desc = correct_string.function_desc
+                        print("code_string = " + str(code_string))
+                        string_list.append(code_string)
     print("++++++++++++++++++ " + str(string_list.__len__()))
     return string_list
 
