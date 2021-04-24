@@ -267,25 +267,25 @@ def write_excel_xls(path, sheet_name, value):
                 continue
             sheet.col(col_index).height = 40 * 40
         other_style = other_cell_style()
-        for index in range(count, end):
-            string = single_module_name_list[index - count]
-            print("index = " + str(index))
-            for col_index in range(12):
-                sheet.col(col_index).width = 256 * 40
-                if col_index == 0:
+        for index1 in range(count, end):
+            android_string = single_module_name_list[index1 - count]
+            print("index1 = " + str(index1))
+            for col_index1 in range(12):
+                sheet.col(col_index1).width = 256 * 40
+                if col_index1 == 0:
                     continue
-                sheet.col(col_index).height = 40 * 40
-            sheet.write(index, 1, string.android_id, style=other_style)
-            sheet.write(index, 2, string.ios_id)
-            sheet.write(index, 3, string.simplified_chinese)
-            sheet.write(index, 4, string.default_lang)
-            sheet.write(index, 5, string.english_us)
-            sheet.write(index, 6, string.spanish)
-            sheet.write(index, 7, string.germany)
-            sheet.write(index, 8, string.french)
-            sheet.write(index, 9, string.russia)
-            sheet.write(index, 10, string.korean)
-            sheet.write(index, 11, string.japan)
+                sheet.col(col_index1).height = 40 * 40
+            sheet.write(index1, 1, android_string.android_id, style=other_style)
+            sheet.write(index1, 2, android_string.ios_id)
+            sheet.write(index1, 3, android_string.simplified_chinese)
+            sheet.write(index1, 4, android_string.default_lang)
+            sheet.write(index1, 5, android_string.english_us)
+            sheet.write(index1, 6, android_string.spanish)
+            sheet.write(index1, 7, android_string.germany)
+            sheet.write(index1, 8, android_string.french)
+            sheet.write(index1, 9, android_string.russia)
+            sheet.write(index1, 10, android_string.korean)
+            sheet.write(index1, 11, android_string.japan)
 
         count = end
         # sheet.write_merge(module_count, module_count - 1, 0, 0, single_module_name_list[i].module_name)
@@ -294,9 +294,7 @@ def write_excel_xls(path, sheet_name, value):
     print("xls格式表格写入数据成功！")
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def read_all_strings_generate_excel():
     all_string_list = read_all_strings_xml()
     all_string = []
     for module in module_name_list:
@@ -340,3 +338,7 @@ if __name__ == '__main__':
             # print(string)
             pass
     write_excel_xls("translation.xlsx", "taile", all_string_dict)
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    print_hi('PyCharm')
