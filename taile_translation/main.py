@@ -21,6 +21,7 @@ def print_hi(name):
 
 
 multination_string_excel_file = "./correct_translation.xlsx"
+final_multination_string_excel_file = "./hello_translation.xlsx"
 mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
 
 module_name_list = ["page-start", "page-scene", "page-scan",
@@ -429,9 +430,9 @@ def get_merged_cells_value(sheet: Sheet, row_index, col_index):
 """
 
 
-def read_multination_string_company_excel():
+def read_multination_string_company_excel(sheetName: str):
     with xlrd.open_workbook(multination_string_excel_file) as excel_workbook:
-        worksheet = excel_workbook.sheet_by_name('Sheet1')
+        worksheet = excel_workbook.sheet_by_name(sheetName)
         multination_string_list = []
         for row_index in range(worksheet.nrows):
             if row_index == 0:
@@ -459,6 +460,79 @@ def read_multination_string_company_excel():
         for taileString in multination_string_list:
             # print(taileString)
             pass
+
+        return multination_string_list
+
+"""
+读取最终版本的 字符串的excel 文件, 他有最全的字段
+"""
+
+def read_final_multination_string_company_excel(sheetName: str):
+    with xlrd.open_workbook(final_multination_string_excel_file) as excel_workbook:
+        worksheet = excel_workbook.sheet_by_name(sheetName)
+        multination_string_list = []
+        for row_index in range(worksheet.nrows):
+            if row_index == 0:
+                continue
+            module_name = ""
+            function_desc = ""
+            android_id = ""
+            ios_id = ""
+            simplified_chinese = ""
+            default_lang = ""
+            english_us = ""
+            spanish = ""
+            germany = ""
+            french = ""
+            russia = ""
+            korean = ""
+            japan = ""
+            page_start = ""
+            for col_index in range(worksheet.ncols):
+                # print(worksheet.cell_value(row_index, col_index))
+                cell_value = worksheet.cell_value(row_index, col_index)
+                print("cell_value = " + cell_value)
+                if col_index == 1:
+                    module_name = get_merged_cells_value(worksheet, row_index, col_index)
+                if col_index == 2:
+                    page_start = cell_value
+                if col_index == 3:
+                    function_desc = cell_value
+                if col_index == 4:
+                    android_id = cell_value
+                if col_index == 5:
+                    ios_id = cell_value
+                if col_index == 6:
+                    simplified_chinese = cell_value
+                if col_index == 7:
+                    default_lang = cell_value
+                if col_index == 8:
+                    english_us = cell_value
+                if col_index == 9:
+                    spanish = cell_value
+
+                if col_index == 10:
+                    germany = cell_value
+                if col_index == 11:
+                    french = cell_value
+                if col_index == 12:
+                    russia = cell_value
+                if col_index == 13:
+                    korean = cell_value
+                if col_index == 14:
+                    japan = cell_value
+
+            taileString = TaileString(module_name=module_name, function_desc=function_desc,
+                                      page_start=page_start,default_lang=default_lang,
+                                      android_id=android_id, ios_id=ios_id,
+                                      germany=germany, french=french, russia=russia,
+                                      korean=korean, japan=japan,spanish=spanish,
+                                      simplified_chinese=simplified_chinese, english_us=english_us)
+            multination_string_list.append(taileString)
+
+        for taileString in multination_string_list:
+            print(taileString)
+
 
         return multination_string_list
 
@@ -525,7 +599,7 @@ def parse_string():
     4. 写入到全新的, 字段全面的 excel 表格里
 
     """
-    correct_string_list = read_multination_string_company_excel()
+    correct_string_list = read_multination_string_company_excel("Sheet1")
     android_code_string_list = read_all_strings_from_android_xml()
     """
     从 correct_translation.xlsx 文件里读出所有的字符串
@@ -700,4 +774,7 @@ def parse_string():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # read_all_strings_generate_excel(
-    parse_string()
+    # parse_string()
+    correct_string_list = read_final_multination_string_company_excel("taile")
+    for xxx in correct_string_list:
+        print(xxx)
