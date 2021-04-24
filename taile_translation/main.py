@@ -326,6 +326,9 @@ def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
     return False
 
 
+"""
+对 list 内的元素, 进行排序, 
+"""
 def sort_string_list(all_string):
     all_string_dict = {}
     taileStringHeaderlist = []
@@ -352,18 +355,15 @@ def sort_string_list(all_string):
     """
      写第一行文件
     """
-    # write_excel_xls("translation.xlsx", "taile", all_string_dict)
 
     """
     排序字段  模块名称 ---> 启动页面
     
     """
-    from operator import attrgetter
 
     for module_name in module_name_list:
         page_start_string_list = []
         print("sort_string_list: module_name =" + module_name)
-        page_start_dict = {}
         for index in range(all_string.__len__()):
             if all_string[index].module_name.__eq__(module_name):
                 print("mmmmmmmm " + all_string[index].__str__())
@@ -382,7 +382,6 @@ def read_all_strings_generate_excel():
     all_string = read_all_strings_from_android_xml()
     print(all_string.__len__())
     all_string_dict_temp = sort_string_list(all_string)
-    print("((((((((((((())))))) ")
 
     print(all_string_dict_temp.keys().__sizeof__())
 
@@ -567,6 +566,9 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
         if code_string.module_name.__eq__(code_module_name):
             print("english us english in code = " + code_string.english_us)
             print("english us   correct one:  " + correct_string.english_us)
+            """
+             对于特殊字符串, 去掉一些符号,然后比较, 比如去掉 中文的 "《"
+            """
             modify_code_english = code_string.english_us.replace("《", "").replace("》", "").strip().lower()
             modify_correct_english = correct_string.english_us.replace("《", "").replace("》", "").strip().lower()
             print("english us   correct one:  modify_correct_english " + modify_correct_english)
