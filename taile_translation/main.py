@@ -329,6 +329,8 @@ def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
 """
 对 list 内的元素, 进行排序, 
 """
+
+
 def sort_string_list(all_string):
     all_string_dict = {}
     taileStringHeaderlist = []
@@ -443,11 +445,13 @@ def get_merged_cells_value(sheet: Sheet, row_index, col_index):
 """
 
 
-def read_multination_string_company_excel(sheetName: str):
+def read_multination_string_excel(sheetName: str):
+    print("================ sheetName = " + sheetName)
     with xlrd.open_workbook(multination_string_excel_file) as excel_workbook:
         worksheet = excel_workbook.sheet_by_name(sheetName)
         multination_string_list = []
         for row_index in range(worksheet.nrows):
+            print("row_index = " + str(row_index))
             if row_index == 0:
                 continue
             module_name = ""
@@ -455,8 +459,8 @@ def read_multination_string_company_excel(sheetName: str):
             simplified_chinese = ""
             english_us = ""
             for col_index in range(worksheet.ncols):
-                # print(worksheet.cell_value(row_index, col_index))
                 cell_value = worksheet.cell_value(row_index, col_index)
+                print("cell_value = " + str(cell_value))
                 if col_index == 1:
                     module_name = get_merged_cells_value(worksheet, row_index, col_index)
                 if col_index == 2:
@@ -471,10 +475,9 @@ def read_multination_string_company_excel(sheetName: str):
             multination_string_list.append(taileString)
 
         for taileString in multination_string_list:
-            # print(taileString)
-            pass
+            print(taileString)
 
-        return multination_string_list
+    return multination_string_list
 
 
 """
@@ -556,7 +559,6 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                                    chinese_and_english: bool):
     string_list = []
     for code_string in android_code_string_list:
-        print("module name = " + code_string.module_name + ", " + code_string.english_us)
         if str(code_string.english_us).__eq__("Ok"):
             continue
         if str(code_string.english_us).__eq__("OK"):
@@ -564,13 +566,28 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
         if str(code_string.english_us).__eq__("Cancel"):
             continue
         if code_string.module_name.__eq__(code_module_name):
-            print("english us english in code = " + code_string.english_us)
-            print("english us   correct one:  " + correct_string.english_us)
             """
              对于特殊字符串, 去掉一些符号,然后比较, 比如去掉 中文的 "《"
             """
-            modify_code_english = code_string.english_us.replace("《", "").replace("》", "").strip().lower()
-            modify_correct_english = correct_string.english_us.replace("《", "").replace("》", "").strip().lower()
+            modify_code_english = code_string.english_us \
+                .replace("《", "") \
+                .replace("？", "?") \
+                .replace("\n", "") \
+                .replace(" ", "") \
+                .replace("》", "") \
+                .replace("\n", "") \
+                .replace("\t", "") \
+                .strip().lower()
+            modify_correct_english = correct_string.english_us \
+                .replace("《", "") \
+                .replace("》", "") \
+                .replace("？", "?") \
+                .replace("\n", "") \
+                .replace(" ", "") \
+                .replace("\t", "") \
+                .replace("\n", "") \
+                .strip().lower()
+            print("english us   correct one:  modify_code_english " + modify_code_english)
             print("english us   correct one:  modify_correct_english " + modify_correct_english)
             modify_code_chinese = code_string.simplified_chinese.replace("《", "").replace("》", "").strip()
             modify_correct_chinese = correct_string.simplified_chinese.replace("《", "").replace("》", "").strip()
@@ -616,7 +633,7 @@ def parse_string():
     4. 写入到全新的, 字段全面的 excel 表格里
 
     """
-    correct_string_list = read_multination_string_company_excel("Sheet1")
+    correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
     """
     从 correct_translation.xlsx 文件里读出所有的字符串
@@ -658,6 +675,7 @@ def parse_string():
     add_device_string_all_list = []
     page_scene_string_all_list = []
     for correct_string in correct_string_list:
+        print("correct_string " + str(correct_string))
         if correct_string.module_name.__eq__("服务协议"):
             service_protocol_list = cross_compare_the_then_get_one(android_code_string_list,
                                                                    correct_string,
