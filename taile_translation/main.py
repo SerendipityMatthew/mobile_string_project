@@ -4,6 +4,9 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import os as os
 import xml.etree.cElementTree as ElementTree
+
+from xlrd.sheet import Sheet
+
 from Taile_String import TaileString
 import pandas as pandas
 
@@ -17,6 +20,7 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
 
+multination_string_excel_file = "/correct_translation.xlsx"
 mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
 
 module_name_list = ["page-start", "page-scene", "page-scan",
@@ -42,7 +46,7 @@ def read_all_strings_xml():
     return string_file_list
 
 
-def parse_module_string(module_name: str):
+def parse_module_string(module_name: str, all_string_list):
     page_start_string_list = []
     string_dict_ko_rKR = {}
     string_dict_none = {}
@@ -226,6 +230,11 @@ def module_name_cell_style():
     return style
 
 
+"""
+为规范表格里的文字的 样式
+"""
+
+
 def other_cell_style():
     style = xlwt.easyxf('font:height 720;')
     font = xlwt.Font()
@@ -239,9 +248,11 @@ def other_cell_style():
     return style
 
 
-#
-# dict { module_name : }
-#
+"""
+    最终生成一个 excel 表格
+"""
+
+
 def write_excel_xls(path, sheet_name, value):
     length = value.__len__()  # 获取需要写入数据的行数
     workbook = xlwt.Workbook()  # 新建一个工作簿
@@ -294,13 +305,24 @@ def write_excel_xls(path, sheet_name, value):
     print("xls格式表格写入数据成功！")
 
 
-def read_all_strings_generate_excel():
+def read_all_strings_from_android_xml():
     all_string_list = read_all_strings_xml()
     all_string = []
     for module in module_name_list:
-        var = parse_module_string(module)
+        var = parse_module_string(module, all_string_list)
         for hello in var:
             all_string.append(hello)
+
+    return all_string
+
+
+"""
+    读取 android 项目下的 所有的 strings.xml 等字符串文件, 然后生成一个 excel 表格.
+"""
+
+
+def read_all_strings_generate_excel():
+    all_string = read_all_strings_from_android_xml()
 
     all_string_dict = {}
     taileStringHeaderlist = []
@@ -339,6 +361,96 @@ def read_all_strings_generate_excel():
             pass
     write_excel_xls("translation.xlsx", "taile", all_string_dict)
 
+
+"""
+读取合并所有的单元格
+"""
+
+
+def get_merged_cells(sheet: Sheet):
+    return sheet.merged_cells
+
+
+"""
+读取合并所有的单元格的值, 这里我们只需要 col_index = 1 的值,就行了. 其他的无所谓
+"""
+
+
+def get_merged_cells_value(sheet: Sheet, row_index, col_index):
+    """
+    先判断给定的单元格，是否属于合并单元格；
+    如果是合并单元格，就返回合并单元格的内容
+    :return:
+    """
+    merged = get_merged_cells(sheet)
+    for (rlow, rhigh, clow, chigh) in merged:
+        if (row_index >= rlow and row_index < rhigh):
+            if (col_index >= clow and col_index < chigh):
+                cell_value = sheet.cell_value(rlow, clow)
+
+                # print('该单元格[%d,%d]属于合并单元格，值为[%s]' % (row_index, col_index, cell_value))
+                return cell_value
+                break
+    return None
+
+
+"""
+从 correct_translation.xlsx 文件里读出所有的字符串
+"""
+
+
+def read_multination_string_company_excel():
+    with xlrd.open_workbook(multination_string_excel_file) as excel_workbook:
+        worksheet = excel_workbook.sheet_by_name('Sheet1')
+        multination_string_list = []
+        for row_index in range(worksheet.nrows):
+            if row_index == 0:
+                continue
+            module_name = ""
+            function_desc = ""
+            simplified_chinese = ""
+            english_us = ""
+            for col_index in range(worksheet.ncols):
+                # print(worksheet.cell_value(row_index, col_index))
+                if col_index == 1:
+                    module_name = get_merged_cells_value(worksheet, row_index, col_index)
+                if col_index == 2:
+                    function_desc = worksheet.cell_value(row_index, col_index)
+                if col_index == 4:
+                    simplified_chinese = worksheet.cell_value(row_index, col_index)
+                if col_index == 5:
+                    english_us = worksheet.cell_value(row_index, col_index)
+
+            taileString = TaileString(module_name=module_name, function_desc=function_desc,
+                                      simplified_chinese=simplified_chinese, english_us=english_us)
+            multination_string_list.append(taileString)
+
+        for taileString in multination_string_list:
+            # print(taileString)
+            pass
+
+        return multination_string_list
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+
+    """
+    大致的流程描述
+    1. 按照模块 读取 android 源代码里的 String
+    2. 读取修正的 excel 表格里的 字符串资源
+    3. 交叉对比里面的文件, 并且赋值正确的功能描述
+    4. 写入到全新的, 字段全面的 excel 表格里
+    
+    """
+    correct_string_list = read_multination_string_company_excel()
+    android_code_string_list = read_all_strings_from_android_xml()
+
+    for correct_string in correct_string_list:
+        for code_string in android_code_string_list:
+            if str(code_string.simplified_chinese).__eq__(str(correct_string.simplified_chinese)):
+                if str(code_string.english_us).__eq__(str(correct_string.english_us)):
+                    code_string.function_desc = correct_string.function_desc
+                    print(code_string)
+
+
