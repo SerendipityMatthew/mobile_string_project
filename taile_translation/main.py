@@ -5,14 +5,11 @@
 import os as os
 import xml.etree.cElementTree as ElementTree
 
+import xlrd
+import xlwt
 from xlrd.sheet import Sheet
 
 from Taile_String import TaileString
-import pandas as pandas
-
-import xlrd
-import xlwt
-from xlutils.copy import copy
 
 
 def print_hi(name):
@@ -20,9 +17,9 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
 
-multination_string_excel_file = "./correct_translation.xlsx"
-final_multination_string_excel_file = "./hello_translation.xlsx"
-mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
+multination_string_excel_file = "correct_translation.xlsx"
+final_multination_string_excel_file = "hello_translation.xlsx"
+mx_app_file_path = "D:\\code\\temp_mxapp_smartplus_android"
 
 module_name_list = ["page-start", "page-scene", "page-scan",
                     "page-ota", "page-message", "page-me",
@@ -41,10 +38,21 @@ def read_all_strings_xml():
             file_path = os.path.join(path, dir_name)
             for dir_path in os.listdir(file_path):
                 file_full_path = os.path.join(file_path, dir_path)
-                if file_full_path.__contains__(".xml") and file_full_path.__contains__("main/res/values"):
+                values_string_path = "main/res/values"
+                if isWindowsSystem():
+                    values_string_path = "main\\res\\values"
+                if file_full_path.__contains__(".xml") and file_full_path.__contains__(values_string_path):
                     string_file_list.append(file_full_path)
 
     return string_file_list
+
+
+def isWindowsSystem():
+    import platform
+    system = platform.system()
+    if system.__eq__("Windows"):
+        return True
+    return False
 
 
 def parse_module_string(module_name: str, all_string_list):
@@ -59,8 +67,14 @@ def parse_module_string(module_name: str, all_string_list):
     string_dict_ru_rRU = {}
     string_dict_ja_rJP = {}
     module_string_list = []
+    file_separator = "/"
+    if isWindowsSystem():
+        file_separator = "\\"
+    print("===========ddddddddddddd========" + str(all_string_list.__len__()))
     for string_file in all_string_list:
-        if string_file.__contains__(module_name + "/"):
+        print("================ string_file = " + string_file)
+
+        if string_file.__contains__(module_name + file_separator):
             page_start_string_list.append(string_file)
 
     for xml_file in page_start_string_list:
@@ -99,42 +113,46 @@ def parse_module_string(module_name: str, all_string_list):
         if xml_file.endswith("device_style.xml"):
             continue
         # print(xml_file)
-        if xml_file.__contains__("res/values/"):
+        res_prefix = "res/"
+        if isWindowsSystem():
+            res_prefix = "res\\"
+
+        if xml_file.__contains__(res_prefix + "values" + "\\"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_none[child.attrib["name"]] = str(child.text)
-        if xml_file.__contains__("res/values-zh-rCN"):
+        if xml_file.__contains__(res_prefix + "values-zh-rCN"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_zh_rCN[child.attrib["name"]] = str(child.text)
-        if xml_file.__contains__("res/values-en-rUS"):
+        if xml_file.__contains__(res_prefix + "values-en-rUS"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_en_rUS[child.attrib["name"]] = str(child.text)
-        if xml_file.__contains__("res/values-de-rDE"):
+        if xml_file.__contains__(res_prefix + "values-de-rDE"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_de_rDE[child.attrib["name"]] = str(child.text)
-        if xml_file.__contains__("res/values-fr-rFR"):
+        if xml_file.__contains__(res_prefix + "values-fr-rFR"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_fr_rFR[child.attrib["name"]] = str(child.text)
 
-        if xml_file.__contains__("res/values-es-rES"):
+        if xml_file.__contains__(res_prefix + "values-es-rES"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_es_rES[child.attrib["name"]] = str(child.text)
-        if xml_file.__contains__("res/values-ko-rKR"):
+        if xml_file.__contains__(res_prefix + "values-ko-rKR"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_ko_rKR[child.attrib["name"]] = str(child.text)
 
-        if xml_file.__contains__("res/values-ru-rRU"):
+        if xml_file.__contains__(res_prefix + "values-ru-rRU"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_ru_rRU[child.attrib["name"]] = str(child.text)
 
-        if xml_file.__contains__("res/values-ja-rJP"):
+        if xml_file.__contains__(res_prefix + "values-ja-rJP"):
             xml_file_doc = ElementTree.parse(xml_file)
             for child in xml_file_doc.getroot():
                 string_dict_ja_rJP[child.attrib["name"]] = str(child.text)
@@ -145,10 +163,11 @@ def parse_module_string(module_name: str, all_string_list):
     # print(string_dict_en_rUS.__len__())
     # print(string_dict_es_rES.__len__())
     # print(string_dict_fr_rFR.__len__())
-    # print(string_dict_de_rDE.__len__())
-    # print(string_dict_ko_rKR.__len__())
-    # print(string_dict_ru_rRU.__len__())
-    # print(string_dict_ja_rJP.__len__())
+    print("每个语言的字符串个个数")
+    print(string_dict_de_rDE.__len__())
+    print(string_dict_ko_rKR.__len__())
+    print(string_dict_ru_rRU.__len__())
+    print(string_dict_ja_rJP.__len__())
 
     for key in string_dict_none.keys():
         default_lang = string_dict_none[key]
@@ -214,6 +233,7 @@ def parse_module_string(module_name: str, all_string_list):
             germany=germany,
             japan=japan,
         )
+        print("taileString = " + str(taileString))
         module_string_list.append(taileString)
     return module_string_list
 
