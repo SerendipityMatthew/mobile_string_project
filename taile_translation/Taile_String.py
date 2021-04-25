@@ -1,7 +1,7 @@
 class TaileString:
     def __init__(self, module_name: str,
                  simplified_chinese: str, english_us: str,
-                 page_start="",
+                 page_start="", isStringArray=False,
                  android_id="", function_desc="",
                  default_lang="", ios_id="",
                  spanish="", french="", russia="",
@@ -9,6 +9,7 @@ class TaileString:
         self.module_name = module_name
         self.page_start = page_start
         self.function_desc = function_desc
+        self.isStringArray = isStringArray
         self.android_id = android_id
         self.ios_id = ios_id
         self.simplified_chinese = simplified_chinese
@@ -27,12 +28,13 @@ class TaileString:
             value = self.__dict__[key]
             if value is None:
                 value = ""
-            string = string + key + " == " + value + "\n"
+            string = string + str(key) + " == " + str(value) + "\n"
         return string
 
     """
      先 根据 module_name 排序, 然后再根据 page_start 字段排序
     """
+
     def __lt__(self, other):
         if self.module_name < other.module_name:
             return True

@@ -8,6 +8,7 @@ import xml.etree.cElementTree as ElementTree
 import xlrd
 import xlwt
 from xlrd.sheet import Sheet
+import platform
 
 from Taile_String import TaileString
 
@@ -19,7 +20,7 @@ def print_hi(name):
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
-mx_app_file_path = "D:\\code\\temp_mxapp_smartplus_android"
+mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
 mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
 module_name_list = ["page-start", "page-scene", "page-scan",
                     "page-ota", "page-message", "page-me",
@@ -41,18 +42,35 @@ def read_all_strings_xml():
                 values_string_path = "main/res/values"
                 if isWindowsSystem():
                     values_string_path = "main\\res\\values"
-                if file_full_path.__contains__(".xml") and file_full_path.__contains__(values_string_path):
-                    string_file_list.append(file_full_path)
+                if file_full_path.__contains__(".xml"):
+                    if file_full_path.__contains__(values_string_path):
+                        string_file_list.append(file_full_path)
 
     return string_file_list
 
 
 def isWindowsSystem():
-    import platform
     system = platform.system()
     if system.__eq__("Windows"):
         return True
     return False
+
+
+def parse_single_string(xml_file):
+    single_xml_file_string_dict = {}
+    xml_file_doc = ElementTree.parse(xml_file)
+    for child in xml_file_doc.getroot():
+        if str(child.tag).__eq__("string-array"):
+            string_array_item_list = []
+            for string_array_item in child.iter():
+                print("==== xxxxx yyyy ======= " + str(string_array_item.text))
+                string_array_item_list.append(string_array_item.text)
+            single_xml_file_string_dict[child.attrib["name"]] = "|".join(string_array_item_list)
+
+        else:
+            single_xml_file_string_dict[child.attrib["name"]] = str(child.text)
+
+    return single_xml_file_string_dict
 
 
 def parse_module_string(module_name: str, all_string_list):
@@ -116,46 +134,28 @@ def parse_module_string(module_name: str, all_string_list):
         res_prefix = "res/"
         if isWindowsSystem():
             res_prefix = "res\\"
-
-        if xml_file.__contains__(res_prefix + "values" + "\\"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_none[child.attrib["name"]] = str(child.text)
+        if xml_file.__contains__(res_prefix + "values" + os.sep):
+            string_dict_none = parse_single_string(xml_file)
         if xml_file.__contains__(res_prefix + "values-zh-rCN"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_zh_rCN[child.attrib["name"]] = str(child.text)
+            string_dict_zh_rCN = parse_single_string(xml_file)
         if xml_file.__contains__(res_prefix + "values-en-rUS"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_en_rUS[child.attrib["name"]] = str(child.text)
+            string_dict_en_rUS = parse_single_string(xml_file)
         if xml_file.__contains__(res_prefix + "values-de-rDE"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_de_rDE[child.attrib["name"]] = str(child.text)
+            string_dict_de_rDE = parse_single_string(xml_file)
         if xml_file.__contains__(res_prefix + "values-fr-rFR"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_fr_rFR[child.attrib["name"]] = str(child.text)
+            string_dict_fr_rFR = parse_single_string(xml_file)
 
         if xml_file.__contains__(res_prefix + "values-es-rES"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_es_rES[child.attrib["name"]] = str(child.text)
+            string_dict_es_rES = parse_single_string(xml_file)
+
         if xml_file.__contains__(res_prefix + "values-ko-rKR"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_ko_rKR[child.attrib["name"]] = str(child.text)
+            string_dict_ko_rKR = parse_single_string(xml_file)
 
         if xml_file.__contains__(res_prefix + "values-ru-rRU"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_ru_rRU[child.attrib["name"]] = str(child.text)
+            string_dict_ru_rRU = parse_single_string(xml_file)
 
         if xml_file.__contains__(res_prefix + "values-ja-rJP"):
-            xml_file_doc = ElementTree.parse(xml_file)
-            for child in xml_file_doc.getroot():
-                string_dict_ja_rJP[child.attrib["name"]] = str(child.text)
+            string_dict_ja_rJP = parse_single_string(xml_file)
 
     # 从中选择出最大的
     # print(string_dict_none.__len__())
@@ -219,10 +219,13 @@ def parse_module_string(module_name: str, all_string_list):
         except KeyError:
             pass
 
+        isStringArray = simplified_chinese.__contains__("|")
+        print(" is string array = " + str(isStringArray))
         taileString = TaileString(
             module_name=module_name,
             android_id=key,
             ios_id="",
+            isStringArray=isStringArray,
             default_lang=default_lang,
             simplified_chinese=simplified_chinese,
             english_us=english_us,
@@ -580,6 +583,7 @@ def read_final_multination_string_company_excel(sheetName: str):
 
 collect_all_xxxx = []
 
+
 def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                                    code_module_name,
                                    chinese_and_english: bool):
@@ -625,7 +629,7 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
             modify_correct_chinese = correct_string.simplified_chinese.replace("《", "").replace("》", "").strip()
             print("modify_code_chinese = " + modify_code_chinese)
             print("modify_correct_chinese = " + modify_correct_chinese)
-            if modify_code_english.__eq__(modify_correct_english):
+            if not code_string.isStringArray and modify_code_english.__eq__(modify_correct_english):
                 if chinese_and_english:
                     if modify_code_chinese.__eq__(modify_correct_chinese):
                         collect_all_xxxx.append(correct_string)
@@ -641,9 +645,21 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                     print("code_string = " + str(code_string))
                     print("correct_string = " + str(correct_string))
                     string_list.append(code_string)
+            elif code_string.isStringArray:
+                """
+                数组类型的
+                """
+                code_array_string = code_string.english_us.split("|")[0].strip()
+
+                if code_array_string.__eq__(correct_string.english_us):
+                    collect_all_xxxx.append(correct_string)
+                    code_string.page_start = correct_string.module_name
+                    code_string.function_desc = correct_string.function_desc
+                    print("code_string = " + str(code_string))
+                    string_list.append(code_string)
             else:
                 """
-                 长句子, 比较第一句话是否相同
+                    长句子, 比较第一句话是否相同
                 """
                 if modify_correct_english.__contains__("."):
                     correct_first_line = modify_correct_english.split(".")[0].strip()
@@ -654,8 +670,76 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                         code_string.function_desc = correct_string.function_desc
                         print("code_string = " + str(code_string))
                         string_list.append(code_string)
+
     print("++++++++++++++++++ " + str(string_list.__len__()))
+
     return string_list
+
+
+def parse_array_string(single_module_list: list):
+    single_module_array_list = []
+    for string in single_module_list:
+        if string.isStringArray:
+            chinese_array_string = string.simplified_chinese.split("|")
+            default_array_string = string.default_lang.split("|")
+            english_array_string = string.english_us.split("|")
+            spanish_array_string = string.spanish.split("|")
+            germany_array_string = string.germany.split("|")
+            french_array_string = string.french.split("|")
+            russia_array_string = string.russia.split("|")
+            korean_array_string = string.korean.split("|")
+            japan_array_string = string.japan.split("|")
+            for index in range(len(chinese_array_string)):
+                simplified_chinese = chinese_array_string[index]
+                default_lang = ""
+                if index < len(default_array_string):
+                    default_lang = default_array_string[index]
+
+                english_us = ""
+                if index < len(default_array_string):
+                    english_us = english_array_string[index]
+                spanish = ""
+                if index < len(spanish_array_string):
+                    spanish = spanish_array_string[index]
+
+                french = ""
+                if index < len(french_array_string):
+                    french = french_array_string[index]
+
+                russia = ""
+                if index < len(russia_array_string):
+                    russia = russia_array_string[index]
+                korean = ""
+                if index < len(korean_array_string):
+                    korean = korean_array_string[index]
+                japan = ""
+                if index < len(japan_array_string):
+                    japan = japan_array_string[index]
+                germany = ""
+                if index < len(germany_array_string):
+                    germany = germany_array_string[index]
+
+                taileString = TaileString(
+                    module_name=string.module_name,
+                    isStringArray=False,
+                    page_start=string.page_start,
+                    android_id=string.android_id,
+                    ios_id="",
+                    function_desc=string.function_desc,
+                    simplified_chinese=simplified_chinese,
+                    default_lang=default_lang,
+                    english_us=english_us,
+                    spanish=spanish,
+                    french=french,
+                    russia=russia,
+                    korean=korean,
+                    japan=japan,
+                    germany=germany,
+                )
+                single_module_array_list.append(taileString)
+        else:
+            single_module_array_list.append(string)
+    return single_module_array_list
 
 
 def parse_string():
@@ -843,6 +927,23 @@ def parse_string():
             page_scene_string_all_list.extend(listA)
             page_scene_string_all_list.extend(listB)
 
+    service_protocol_all_list = parse_array_string(service_protocol_all_list)
+    register_string_all_list = parse_array_string(register_string_all_list)
+    login_string_all_list = parse_array_string(login_string_all_list)
+    forgot_string_all_list = parse_array_string(forgot_string_all_list)
+    first_page_string_all_list = parse_array_string(first_page_string_all_list)
+    home_management_string_all_list = parse_array_string(home_management_string_all_list)
+    intelligence_string_all_list = parse_array_string(intelligence_string_all_list)
+    about_string_all_list = parse_array_string(about_string_all_list)
+    mine_setting_string_all_list = parse_array_string(mine_setting_string_all_list)
+    setting_string_all_list = parse_array_string(setting_string_all_list)
+    message_center_string_all_list = parse_array_string(message_center_string_all_list)
+    feedback_string_all_list = parse_array_string(feedback_string_all_list)
+    device_share_string_all_list = parse_array_string(device_share_string_all_list)
+    faq_string_all_list = parse_array_string(faq_string_all_list)
+    about_company_string_all_list = parse_array_string(about_company_string_all_list)
+    add_device_string_all_list = parse_array_string(add_device_string_all_list)
+    page_scene_string_all_list = parse_array_string(page_scene_string_all_list)
     for hello in service_protocol_all_list:
         print("hello = " + str(hello.page_start))
     all_list = []
