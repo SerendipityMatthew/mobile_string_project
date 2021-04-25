@@ -20,13 +20,13 @@ def print_hi(name):
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
 mx_app_file_path = "D:\\code\\temp_mxapp_smartplus_android"
-
+mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
 module_name_list = ["page-start", "page-scene", "page-scan",
                     "page-ota", "page-message", "page-me",
                     "page-device-add", "page-device-add-sdk",
                     "page-account", "page-device",
                     "mxchip-component", "ilop-component",
-                    "page-share", "mxapp_smartplus_android/src"
+                    "page-share", mxapp_smartplus_android_common
                     ]
 
 
@@ -357,7 +357,7 @@ def sort_string_list(all_string):
     taileStringHeader = TaileString(
         module_name="功能模块",
         function_desc="功能描述",
-        page_start="启动页面",
+        page_start="所在页面",
         android_id="android 资源id",
         ios_id="ios 资源id",
         simplified_chinese="中文",
@@ -574,17 +574,23 @@ def read_final_multination_string_company_excel(sheetName: str):
         return multination_string_list
 
 
+"""
+交叉对比 代码当中 string 和 正确翻译的 excel 文件中的 string
+"""
+
+collect_all_xxxx = []
+
 def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                                    code_module_name,
                                    chinese_and_english: bool):
     string_list = []
     for code_string in android_code_string_list:
-        if str(code_string.english_us).__eq__("Ok"):
-            continue
-        if str(code_string.english_us).__eq__("OK"):
-            continue
-        if str(code_string.english_us).__eq__("Cancel"):
-            continue
+        # if str(code_string.english_us).__eq__("Ok"):
+        #     continue
+        # if str(code_string.english_us).__eq__("OK"):
+        #     continue
+        # if str(code_string.english_us).__eq__("Cancel"):
+        #     continue
         if code_string.module_name.__eq__(code_module_name):
             """
              对于特殊字符串, 去掉一些符号,然后比较, 比如去掉 中文的 "《"
@@ -592,20 +598,26 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
             modify_code_english = code_string.english_us \
                 .replace("《", "") \
                 .replace("？", "?") \
+                .replace("?", "") \
                 .replace("\n", "") \
                 .replace("  ", "") \
                 .replace("》", "") \
+                .replace("\\", "") \
                 .replace("\n", "") \
                 .replace("\t", "") \
+                .replace(", ", ",") \
                 .strip().lower()
             modify_correct_english = correct_string.english_us \
                 .replace("《", "") \
                 .replace("》", "") \
                 .replace("？", "?") \
+                .replace("?", "") \
                 .replace("\n", "") \
                 .replace("  ", "") \
+                .replace("\\", "") \
                 .replace("\t", "") \
                 .replace("\n", "") \
+                .replace(", ", ",") \
                 .strip().lower()
             print("english us   correct one:  modify_code_english " + modify_code_english)
             print("english us   correct one:  modify_correct_english " + modify_correct_english)
@@ -616,12 +628,14 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
             if modify_code_english.__eq__(modify_correct_english):
                 if chinese_and_english:
                     if modify_code_chinese.__eq__(modify_correct_chinese):
+                        collect_all_xxxx.append(correct_string)
                         code_string.page_start = correct_string.module_name
                         code_string.function_desc = correct_string.function_desc
                         print("code_string = " + str(code_string))
                         print("correct_string = " + str(correct_string))
                         string_list.append(code_string)
                 else:
+                    collect_all_xxxx.append(correct_string)
                     code_string.page_start = correct_string.module_name
                     code_string.function_desc = correct_string.function_desc
                     print("code_string = " + str(code_string))
@@ -635,6 +649,7 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                     correct_first_line = modify_correct_english.split(".")[0].strip()
                     code_first_line = modify_code_english.split(".")[0].strip()
                     if code_first_line.__eq__(correct_first_line):
+                        collect_all_xxxx.append(correct_string)
                         code_string.page_start = correct_string.module_name
                         code_string.function_desc = correct_string.function_desc
                         print("code_string = " + str(code_string))
@@ -661,7 +676,7 @@ def parse_string():
     登录功能   ----> ilop-component page-account
     忘记/修改密码   ---> page-account
     首页     ----> ilop-component  page-device
-    家庭管理  ----> page-device
+    家庭管理  ----> page-device  ilop-component
     智能   -----> page-scene
     我的   -----> page-me
     个人设置 ----> page-me
@@ -698,7 +713,7 @@ def parse_string():
         if correct_string.module_name.__eq__("服务协议"):
             service_protocol_list = cross_compare_the_then_get_one(android_code_string_list,
                                                                    correct_string,
-                                                                   "mxapp_smartplus_android/src", False)
+                                                                   mxapp_smartplus_android_common, False)
             service_protocol_all_list.extend(service_protocol_list)
         if correct_string.module_name.__eq__("注册功能"):
             register_string_list = cross_compare_the_then_get_one(android_code_string_list,
@@ -735,7 +750,11 @@ def parse_string():
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
                                                    "page-device", False)
+            listB = cross_compare_the_then_get_one(android_code_string_list,
+                                                   correct_string,
+                                                   "ilop-component", False)
             home_management_string_all_list.extend(listA)
+            home_management_string_all_list.extend(listB)
 
         if correct_string.module_name.__eq__("智能"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
@@ -786,7 +805,11 @@ def parse_string():
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
                                                    "page-me", False)
+            listB = cross_compare_the_then_get_one(android_code_string_list,
+                                                   correct_string,
+                                                   "ilop-component", False)
             faq_string_all_list.extend(listA)
+            faq_string_all_list.extend(listB)
         if correct_string.module_name.__eq__("关于我们"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
@@ -802,14 +825,23 @@ def parse_string():
                                                    "page-device-add", False)
             listB = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
+                                                   "page-device-add-sdk", False)
+
+            listC = cross_compare_the_then_get_one(android_code_string_list,
+                                                   correct_string,
                                                    "ilop-component", False)
             add_device_string_all_list.extend(listA)
             add_device_string_all_list.extend(listB)
+            add_device_string_all_list.extend(listC)
         if correct_string.module_name.__eq__("虚拟按钮"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
                                                    "page-scene", False)
+            listB = cross_compare_the_then_get_one(android_code_string_list,
+                                                   correct_string,
+                                                   "page-device", False)
             page_scene_string_all_list.extend(listA)
+            page_scene_string_all_list.extend(listB)
 
     for hello in service_protocol_all_list:
         print("hello = " + str(hello.page_start))
@@ -831,7 +863,22 @@ def parse_string():
     all_list.extend(about_company_string_all_list)
     all_list.extend(add_device_string_all_list)
     all_list.extend(page_scene_string_all_list)
-    write_excel_xls("hello_translation.xlsx", "taile", sort_string_list(all_list))
+    write_excel_xls(final_multination_string_excel_file, "taile", sort_string_list(list(set(all_list))))
+
+    os.rename(final_multination_string_excel_file, final_multination_string_excel_file[:-1])
+
+    # 求差集，在B中但不在A中
+    both_collect_correct_list = []
+    for correct_string in correct_string_list:
+        for all_list_string in all_list:
+            if correct_string.simplified_chinese.__eq__(all_list_string.simplified_chinese):
+                if correct_string.english_us.__eq__(all_list_string.english_us):
+                    both_collect_correct_list.append(correct_string)
+
+    # correct_string_list 中有而 both_collect_correct_list 中没有的
+    diff_list = list(set(correct_string_list).difference(set(collect_all_xxxx)))
+    for taile_string in diff_list:
+        print("the have not found string: taile_string =    " + str(taile_string))
 
 
 # Press the green button in the gutter to run the script.
