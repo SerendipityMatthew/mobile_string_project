@@ -20,7 +20,7 @@ def print_hi(name):
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
-mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
+mx_app_file_path = "D:\\code\\temp_mxapp_smartplus_android"
 mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
 module_name_list = ["page-start", "page-scene", "page-scan",
                     "page-ota", "page-message", "page-me",
@@ -29,6 +29,14 @@ module_name_list = ["page-start", "page-scene", "page-scan",
                     "mxchip-component", "ilop-component",
                     "page-share", mxapp_smartplus_android_common
                     ]
+
+page_list = ["服务协议", "注册功能", "登录功能",
+             "忘记/修改密码", "首页", "家庭管理",
+             "智能", "我的", "个人设置",
+             "设置","消息中心","问题反馈",
+             "使用帮助", "设备共享","关于我们",
+             "添加设备","虚拟按钮",
+             ]
 
 
 def read_all_strings_xml():
@@ -311,9 +319,9 @@ def write_excel_xls(path, sheet_name, value):
                 if col_index1 == 0:
                     continue
                 sheet.col(col_index1).height = 40 * 40
-            sheet.write(index1, 1, android_string.page_start)
+            sheet.write(index1, 1, android_string.module_name)
             sheet.write(index1, 2, android_string.function_desc)
-            sheet.write(index1, 3, android_string.android_id, style=other_style)
+            sheet.write(index1, 3, android_string.android_id)
             sheet.write(index1, 4, android_string.ios_id)
             sheet.write(index1, 5, android_string.simplified_chinese)
             sheet.write(index1, 6, android_string.default_lang)
@@ -352,7 +360,7 @@ def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
 """
 对 list 内的元素, 进行排序, 
 """
-
+sorted_by_module = False
 
 def sort_string_list(all_string):
     all_string_dict = {}
@@ -385,16 +393,26 @@ def sort_string_list(all_string):
     排序字段  模块名称 ---> 启动页面
     
     """
-
-    for module_name in module_name_list:
-        page_start_string_list = []
-        print("sort_string_list: module_name =" + module_name)
-        for index in range(all_string.__len__()):
-            if all_string[index].module_name.__eq__(module_name):
-                print("mmmmmmmm " + all_string[index].__str__())
-                page_start_string_list.append(all_string[index])
-        page_start_string_list.sort()
-        all_string_dict[module_name] = page_start_string_list
+    if sorted_by_module:
+        for module_name in module_name_list:
+            page_start_string_list = []
+            print("sort_string_list: module_name =" + module_name)
+            for index in range(all_string.__len__()):
+                if all_string[index].module_name.__eq__(module_name):
+                    print("mmmmmmmm " + all_string[index].__str__())
+                    page_start_string_list.append(all_string[index])
+            page_start_string_list.sort()
+            all_string_dict[module_name] = page_start_string_list
+    else:
+        for page_name in page_list:
+            page_start_string_list = []
+            print("sort_string_list: page_name =" + page_name)
+            for index in range(all_string.__len__()):
+                if all_string[index].page_start.__eq__(page_name):
+                    print("page_name =  " + all_string[index].__str__())
+                    page_start_string_list.append(all_string[index])
+            page_start_string_list.sort()
+            all_string_dict[page_name] = page_start_string_list
     return all_string_dict
 
 
