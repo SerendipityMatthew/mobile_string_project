@@ -39,6 +39,8 @@ class TaileString:
         if self.module_name < other.module_name:
             return True
         if self.module_name == other.module_name:
+            if self.page_start is None:
+                return False
             if self.page_start < other.page_start:
                 return True
             return False

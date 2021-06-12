@@ -20,7 +20,7 @@ def print_hi(name):
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
-mx_app_file_path = "D:\\code\\temp_mxapp_smartplus_android"
+mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
 mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
 module_name_list = ["page-start", "page-scene", "page-scan",
                     "page-ota", "page-message", "page-me",
@@ -33,13 +33,17 @@ module_name_list = ["page-start", "page-scene", "page-scan",
 page_list = ["服务协议", "注册功能", "登录功能",
              "忘记/修改密码", "首页", "家庭管理",
              "智能", "我的", "个人设置",
-             "设置","消息中心","问题反馈",
-             "使用帮助", "设备共享","关于我们",
-             "添加设备","虚拟按钮",
+             "设置", "消息中心", "问题反馈",
+             "使用帮助", "设备共享", "关于我们",
+             "添加设备", "虚拟按钮",
              ]
 
 
 def read_all_strings_xml():
+    """
+        过滤出所有的符合条件的 strings 文件
+    :return:
+    """
     app_file = os.walk(mx_app_file_path)
     string_file_list = []
     for path, dir_list, file_list in app_file:
@@ -76,6 +80,8 @@ def parse_single_string(xml_file):
             single_xml_file_string_dict[child.attrib["name"]] = "|".join(string_array_item_list)
 
         else:
+            print("the current parse string child.text = " + str(child.text))
+            print("the current parse string child.attrib[name] = " + child.attrib["name"])
             single_xml_file_string_dict[child.attrib["name"]] = str(child.text)
 
     return single_xml_file_string_dict
@@ -166,8 +172,8 @@ def parse_module_string(module_name: str, all_string_list):
             string_dict_ja_rJP = parse_single_string(xml_file)
 
     # 从中选择出最大的
-    # print(string_dict_none.__len__())
-    # print(string_dict_zh_rCN.__len__())
+    print(string_dict_none.__len__())
+    print("@@@@@@@@@@@@ " + str(string_dict_none))
     # print(string_dict_en_rUS.__len__())
     # print(string_dict_es_rES.__len__())
     # print(string_dict_fr_rFR.__len__())
@@ -187,7 +193,7 @@ def parse_module_string(module_name: str, all_string_list):
         korean = ""
         russia = ""
         japan = ""
-
+        print("--------------- " + key)
         try:
             simplified_chinese = string_dict_zh_rCN[key]
         except KeyError:
@@ -244,7 +250,7 @@ def parse_module_string(module_name: str, all_string_list):
             germany=germany,
             japan=japan,
         )
-        print("taileString = " + str(taileString))
+        print("taileString = " + str(taileString) + " android_id = " + key)
         module_string_list.append(taileString)
     return module_string_list
 
@@ -361,6 +367,7 @@ def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
 对 list 内的元素, 进行排序, 
 """
 sorted_by_module = False
+
 
 def sort_string_list(all_string):
     all_string_dict = {}
@@ -613,7 +620,11 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
         #     continue
         # if str(code_string.english_us).__eq__("Cancel"):
         #     continue
+        print("cross_compare_the_then_get_one = code_module_name = " + code_module_name)
+        print("cross_compare_the_then_get_one = code_string.module_name = " + code_string.module_name)
         if code_string.module_name.__eq__(code_module_name):
+            print("===========================================")
+            print("=========================================== code_string.english_us = " + code_string.english_us)
             """
              对于特殊字符串, 去掉一些符号,然后比较, 比如去掉 中文的 "《"
             """
@@ -641,13 +652,17 @@ def cross_compare_the_then_get_one(android_code_string_list, correct_string,
                 .replace("\n", "") \
                 .replace(", ", ",") \
                 .strip().lower()
-            print("english us   correct one:  modify_code_english " + modify_code_english)
-            print("english us   correct one:  modify_correct_english " + modify_correct_english)
+
             modify_code_chinese = code_string.simplified_chinese.replace("《", "").replace("》", "").strip()
             modify_correct_chinese = correct_string.simplified_chinese.replace("《", "").replace("》", "").strip()
             print("modify_code_chinese = " + modify_code_chinese)
             print("modify_correct_chinese = " + modify_correct_chinese)
+            print("modify_correct_chinese code_string = " + str(code_string))
+            print("modify_correct_chinese code_string.isStringArray = " + str(code_string.isStringArray))
+            print("english us   correct one:  modify_code_english = " + modify_code_english)
+            print("english us   correct one:  modify_correct_english = " + modify_correct_english)
             if not code_string.isStringArray and modify_code_english.__eq__(modify_correct_english):
+                print("[[[[[[[[[[[[[[[[[[[[[[[[[")
                 if chinese_and_english:
                     if modify_code_chinese.__eq__(modify_correct_chinese):
                         collect_all_xxxx.append(correct_string)
@@ -786,7 +801,7 @@ def parse_string():
     消息中心  ---->page-message
     问题反馈    --->ilop-component
     设备共享   -----> page-share
-    使用帮助   ---->   page-me
+    使用帮助   ---->   page-me ilop-component
     关于我们    ----> page-me  ilop-component
     添加设备   ----> page-device-add  ilop-component
     虚拟按钮   ----> page-scene
@@ -816,6 +831,7 @@ def parse_string():
             service_protocol_list = cross_compare_the_then_get_one(android_code_string_list,
                                                                    correct_string,
                                                                    mxapp_smartplus_android_common, False)
+            print("service_protocol_list = " + str(service_protocol_list.__len__()))
             service_protocol_all_list.extend(service_protocol_list)
         if correct_string.module_name.__eq__("注册功能"):
             register_string_list = cross_compare_the_then_get_one(android_code_string_list,
@@ -912,6 +928,7 @@ def parse_string():
                                                    "ilop-component", False)
             faq_string_all_list.extend(listA)
             faq_string_all_list.extend(listB)
+            print("==================")
         if correct_string.module_name.__eq__("关于我们"):
             listA = cross_compare_the_then_get_one(android_code_string_list,
                                                    correct_string,
@@ -944,7 +961,7 @@ def parse_string():
                                                    "page-device", False)
             page_scene_string_all_list.extend(listA)
             page_scene_string_all_list.extend(listB)
-
+    print("service_protocol_all_list = " + str(service_protocol_all_list.__len__()))
     service_protocol_all_list = parse_array_string(service_protocol_all_list)
     register_string_all_list = parse_array_string(register_string_all_list)
     login_string_all_list = parse_array_string(login_string_all_list)
