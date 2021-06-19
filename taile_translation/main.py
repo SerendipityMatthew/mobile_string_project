@@ -22,6 +22,8 @@ multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
 mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
 mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
+# module_name_list = ["page-message"]
+
 module_name_list = ["page-start", "page-scene", "page-scan",
                     "page-ota", "page-message", "page-me",
                     "page-device-add", "page-device-add-sdk",
@@ -29,7 +31,6 @@ module_name_list = ["page-start", "page-scene", "page-scan",
                     "mxchip-component", "ilop-component",
                     "page-share", mxapp_smartplus_android_common
                     ]
-
 page_list = ["服务协议", "注册功能", "登录功能",
              "忘记/修改密码", "首页", "家庭管理",
              "智能", "我的", "个人设置",
@@ -71,6 +72,8 @@ def isWindowsSystem():
 def parse_single_string(xml_file):
     single_xml_file_string_dict = {}
     xml_file_doc = ElementTree.parse(xml_file)
+    print("parse_single_string: xml_file = " + str(xml_file))
+
     for child in xml_file_doc.getroot():
         if str(child.tag).__eq__("string-array"):
             string_array_item_list = []
@@ -80,8 +83,6 @@ def parse_single_string(xml_file):
             single_xml_file_string_dict[child.attrib["name"]] = "|".join(string_array_item_list)
 
         else:
-            print("the current parse string child.text = " + str(child.text))
-            print("the current parse string child.attrib[name] = " + child.attrib["name"])
             single_xml_file_string_dict[child.attrib["name"]] = str(child.text)
 
     return single_xml_file_string_dict
@@ -104,12 +105,13 @@ def parse_module_string(module_name: str, all_string_list):
         file_separator = "\\"
     print("===========ddddddddddddd========" + str(all_string_list.__len__()))
     for string_file in all_string_list:
-        print("================ string_file = " + string_file)
+        module_name_str = module_name + file_separator
 
-        if string_file.__contains__(module_name + file_separator):
+        if string_file.__contains__(module_name_str):
             page_start_string_list.append(string_file)
 
     for xml_file in page_start_string_list:
+
         if xml_file.endswith("dimen.xml"):
             continue
         if xml_file.endswith("color.xml"):
@@ -143,6 +145,16 @@ def parse_module_string(module_name: str, all_string_list):
         if xml_file.endswith("account_style.xml"):
             continue
         if xml_file.endswith("device_style.xml"):
+            continue
+        if xml_file.endswith("ilop_message_switchbtn_styles.xml"):
+            continue
+
+        if xml_file.endswith("app_styles.xml"):
+            continue
+        if xml_file.endswith("ids.xml"):
+            continue
+
+        if xml_file.endswith("arrays.xml"):
             continue
         # print(xml_file)
         res_prefix = "res/"
@@ -349,8 +361,10 @@ def write_excel_xls(path, sheet_name, value):
 def read_all_strings_from_android_xml():
     all_string_list = read_all_strings_xml()
     all_string = []
-    for module in module_name_list:
-        var = parse_module_string(module, all_string_list)
+    print("hhhhhhhh = " + str(module_name_list.__len__()))
+    for module_name in module_name_list:
+        print("bbbbbbbbbbbbb: module = " + str(module_name))
+        var = parse_module_string(module_name, all_string_list)
         for hello in var:
             all_string.append(hello)
 
@@ -366,7 +380,7 @@ def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
 """
 对 list 内的元素, 进行排序, 
 """
-sorted_by_module = False
+sorted_by_module = True
 
 
 def sort_string_list(all_string):
@@ -775,6 +789,61 @@ def parse_array_string(single_module_list: list):
     return single_module_array_list
 
 
+def write_code_string_excel_xls(path: str, sorted_string_map: dict):
+    length = sorted_string_map.__len__()  # 获取需要写入数据的行数
+    workbook = xlwt.Workbook()  # 新建一个工作簿
+    print("========== length " + str(length))
+    sheet = workbook.add_sheet("code_string")  # 在工作簿中新建一个表格
+    count = 0
+    cell_style = module_name_cell_style()
+    # 遍历 所有的 字符串资源
+    for key in sorted_string_map.keys():
+        single_module_name_list = sorted_string_map[key]
+        print("key  = " + key + ", the length: " + str(single_module_name_list.__len__()))
+        # 写入一个模块的资源
+        module_count = single_module_name_list.__len__()
+        print("========= module_count = " + str(module_count))
+        if module_count == 0:
+            continue
+        end = count + module_count
+        print("========= count = " + str(count))
+        print("========= end = " + str(end))
+        sheet.write_merge(count, end - 1, 0, 0, key, style=cell_style)
+        for col_index in range(single_module_name_list[0].__dict__.keys().__sizeof__()):
+            sheet.col(col_index).width = 256 * 40
+            if col_index == 0:
+                continue
+            sheet.col(col_index).height = 40 * 40
+        other_style = other_cell_style()
+        for index1 in range(count, end):
+            android_string = single_module_name_list[index1 - count]
+            # print("index1 = " + str(index1))
+            for col_index1 in range(12):
+                sheet.col(col_index1).width = 256 * 40
+                if col_index1 == 0:
+                    continue
+                sheet.col(col_index1).height = 40 * 40
+            sheet.write(index1, 1, android_string.module_name)
+            sheet.write(index1, 2, android_string.function_desc)
+            sheet.write(index1, 3, android_string.android_id)
+            sheet.write(index1, 4, android_string.ios_id)
+            sheet.write(index1, 5, android_string.simplified_chinese)
+            sheet.write(index1, 6, android_string.default_lang)
+            sheet.write(index1, 7, android_string.english_us)
+            sheet.write(index1, 8, android_string.spanish)
+            sheet.write(index1, 9, android_string.germany)
+            sheet.write(index1, 10, android_string.french)
+            sheet.write(index1, 11, android_string.russia)
+            sheet.write(index1, 12, android_string.korean)
+            sheet.write(index1, 13, android_string.japan)
+
+        count = end
+        # sheet.write_merge(module_count, module_count - 1, 0, 0, single_module_name_list[i].module_name)
+
+    workbook.save(path)  # 保存工作簿
+    print("xls格式表格写入数据成功！")
+
+
 def parse_string():
     """
     大致的流程描述
@@ -784,237 +853,11 @@ def parse_string():
     4. 写入到全新的, 字段全面的 excel 表格里
 
     """
-    correct_string_list = read_multination_string_excel(sheetName='Sheet1')
+    # correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
-    """
-    从 correct_translation.xlsx 文件里读出所有的字符串
-    服务协议  ----> mxapp_smartplus_android/src
-    注册功能   ----> page-account
-    登录功能   ----> ilop-component page-account
-    忘记/修改密码   ---> page-account
-    首页     ----> ilop-component  page-device
-    家庭管理  ----> page-device  ilop-component
-    智能   -----> page-scene
-    我的   -----> page-me
-    个人设置 ----> page-me
-    设置    ---> page-ota page-me ilop-component
-    消息中心  ---->page-message
-    问题反馈    --->ilop-component
-    设备共享   -----> page-share
-    使用帮助   ---->   page-me ilop-component
-    关于我们    ----> page-me  ilop-component
-    添加设备   ----> page-device-add  ilop-component
-    虚拟按钮   ----> page-scene
-    设备详情
-    """
-    updated_string_list = []
-    service_protocol_all_list = []
-    register_string_all_list = []
-    login_string_all_list = []
-    forgot_string_all_list = []
-    first_page_string_all_list = []
-    home_management_string_all_list = []
-    intelligence_string_all_list = []
-    about_string_all_list = []
-    mine_setting_string_all_list = []
-    setting_string_all_list = []
-    message_center_string_all_list = []
-    feedback_string_all_list = []
-    device_share_string_all_list = []
-    faq_string_all_list = []
-    about_company_string_all_list = []
-    add_device_string_all_list = []
-    page_scene_string_all_list = []
-    for correct_string in correct_string_list:
-        print("correct_string " + str(correct_string))
-        if correct_string.module_name.__eq__("服务协议"):
-            service_protocol_list = cross_compare_the_then_get_one(android_code_string_list,
-                                                                   correct_string,
-                                                                   mxapp_smartplus_android_common, False)
-            print("service_protocol_list = " + str(service_protocol_list.__len__()))
-            service_protocol_all_list.extend(service_protocol_list)
-        if correct_string.module_name.__eq__("注册功能"):
-            register_string_list = cross_compare_the_then_get_one(android_code_string_list,
-                                                                  correct_string,
-                                                                  "page-account", True)
-            register_string_all_list.extend(register_string_list)
-        if correct_string.module_name.__eq__("登录功能"):
-            login_listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                         correct_string,
-                                                         "ilop-component", True)
-            login_listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                         correct_string,
-                                                         "page-account", False)
-            login_string_all_list.extend(login_listA)
-            login_string_all_list.extend(login_listB)
-
-        if correct_string.module_name.__eq__("忘记/修改密码"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-account", False)
-            forgot_string_all_list.extend(listA)
-
-        if correct_string.module_name.__eq__("首页"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-device", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            first_page_string_all_list.extend(listA)
-            first_page_string_all_list.extend(listB)
-
-        if correct_string.module_name.__eq__("家庭管理"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-device", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            home_management_string_all_list.extend(listA)
-            home_management_string_all_list.extend(listB)
-
-        if correct_string.module_name.__eq__("智能"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-scene", False)
-            intelligence_string_all_list.extend(listA)
-
-        if correct_string.module_name.__eq__("我的"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-me", False)
-            about_string_all_list.extend(listA)
-        if correct_string.module_name.__eq__("个人设置"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-me", False)
-            mine_setting_string_all_list.extend(listA)
-        if correct_string.module_name.__eq__("设置"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-ota", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-me", False)
-            listC = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            setting_string_all_list.extend(listA)
-            setting_string_all_list.extend(listB)
-            setting_string_all_list.extend(listC)
-        if correct_string.module_name.__eq__("消息中心"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-message", False)
-            message_center_string_all_list.extend(listA)
-        if correct_string.module_name.__eq__("问题反馈"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            feedback_string_all_list.extend(listA)
-
-        if correct_string.module_name.__eq__("设备共享"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-share", False)
-            device_share_string_all_list.extend(listA)
-        if correct_string.module_name.__eq__("使用帮助"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-me", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            faq_string_all_list.extend(listA)
-            faq_string_all_list.extend(listB)
-            print("==================")
-        if correct_string.module_name.__eq__("关于我们"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-me", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            about_company_string_all_list.extend(listA)
-            about_company_string_all_list.extend(listB)
-        if correct_string.module_name.__eq__("添加设备"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-device-add", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-device-add-sdk", False)
-
-            listC = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "ilop-component", False)
-            add_device_string_all_list.extend(listA)
-            add_device_string_all_list.extend(listB)
-            add_device_string_all_list.extend(listC)
-        if correct_string.module_name.__eq__("虚拟按钮"):
-            listA = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-scene", False)
-            listB = cross_compare_the_then_get_one(android_code_string_list,
-                                                   correct_string,
-                                                   "page-device", False)
-            page_scene_string_all_list.extend(listA)
-            page_scene_string_all_list.extend(listB)
-    print("service_protocol_all_list = " + str(service_protocol_all_list.__len__()))
-    service_protocol_all_list = parse_array_string(service_protocol_all_list)
-    register_string_all_list = parse_array_string(register_string_all_list)
-    login_string_all_list = parse_array_string(login_string_all_list)
-    forgot_string_all_list = parse_array_string(forgot_string_all_list)
-    first_page_string_all_list = parse_array_string(first_page_string_all_list)
-    home_management_string_all_list = parse_array_string(home_management_string_all_list)
-    intelligence_string_all_list = parse_array_string(intelligence_string_all_list)
-    about_string_all_list = parse_array_string(about_string_all_list)
-    mine_setting_string_all_list = parse_array_string(mine_setting_string_all_list)
-    setting_string_all_list = parse_array_string(setting_string_all_list)
-    message_center_string_all_list = parse_array_string(message_center_string_all_list)
-    feedback_string_all_list = parse_array_string(feedback_string_all_list)
-    device_share_string_all_list = parse_array_string(device_share_string_all_list)
-    faq_string_all_list = parse_array_string(faq_string_all_list)
-    about_company_string_all_list = parse_array_string(about_company_string_all_list)
-    add_device_string_all_list = parse_array_string(add_device_string_all_list)
-    page_scene_string_all_list = parse_array_string(page_scene_string_all_list)
-    for hello in service_protocol_all_list:
-        print("hello = " + str(hello.page_start))
-    all_list = []
-    all_list.extend(service_protocol_all_list)
-    all_list.extend(register_string_all_list)
-    all_list.extend(login_string_all_list)
-    all_list.extend(forgot_string_all_list)
-    all_list.extend(first_page_string_all_list)
-    all_list.extend(home_management_string_all_list)
-    all_list.extend(intelligence_string_all_list)
-    all_list.extend(about_string_all_list)
-    all_list.extend(mine_setting_string_all_list)
-    all_list.extend(setting_string_all_list)
-    all_list.extend(message_center_string_all_list)
-    all_list.extend(feedback_string_all_list)
-    all_list.extend(device_share_string_all_list)
-    all_list.extend(faq_string_all_list)
-    all_list.extend(about_company_string_all_list)
-    all_list.extend(add_device_string_all_list)
-    all_list.extend(page_scene_string_all_list)
-    write_excel_xls(final_multination_string_excel_file, "taile", sort_string_list(list(set(all_list))))
-
-    os.rename(final_multination_string_excel_file, final_multination_string_excel_file[:-1])
-
-    # 求差集，在B中但不在A中
-    both_collect_correct_list = []
-    for correct_string in correct_string_list:
-        for all_list_string in all_list:
-            if correct_string.simplified_chinese.__eq__(all_list_string.simplified_chinese):
-                if correct_string.english_us.__eq__(all_list_string.english_us):
-                    both_collect_correct_list.append(correct_string)
-
-    # correct_string_list 中有而 both_collect_correct_list 中没有的
-    diff_list = list(set(correct_string_list).difference(set(collect_all_xxxx)))
-    for taile_string in diff_list:
-        print("the have not found string: taile_string =    " + str(taile_string))
+    sorted_string_map = sort_string_list(android_code_string_list)
+    print("=============== fffffff  " + str(sorted_string_map.__len__()))
+    write_code_string_excel_xls("code_string_translation.xlsx", sorted_string_map)
 
 
 # Press the green button in the gutter to run the script.
