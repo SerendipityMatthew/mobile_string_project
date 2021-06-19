@@ -3,7 +3,7 @@ from xml.etree.ElementTree import ElementTree, SubElement, Element
 import pandas
 
 from Taile_String import TaileString
-from main import mxapp_smartplus_android_common, sort_string_list
+from parse_app_project_string import mxapp_smartplus_android_common, sort_string_list
 from xml_utils import generate_string_res
 
 string_excel_file = "code_string_translation.xls"
