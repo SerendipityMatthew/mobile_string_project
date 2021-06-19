@@ -1,7 +1,9 @@
 import os
 
 # settings_gradle_file = "/Volumes/Mathew/code/mxchip/develop_deye_android/settings.gradle"
-project_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android/"
+common_path = "/Volumes/Mathew/code/mxchip"
+project_name = "mxapp_smartplus_android"
+project_path = common_path + os.sep + project_name + os.sep
 
 
 def parse_app_modules(project_settings_path):
@@ -33,6 +35,10 @@ def parse_app_modules(project_settings_path):
 
 
 def get_app_project_module():
+    """
+    获取这个 app 项目里包含的模块, 包含 src 目录和 app/src 目录
+    :return:
+    """
     settings_gradle_file = project_path + "settings.gradle"
     module_list = parse_app_modules(settings_gradle_file)
     module_path_list = []
@@ -40,7 +46,19 @@ def get_app_project_module():
         for module_name in module_list:
             if file_name.__eq__(module_name):
                 module_path_list.append(module_name)
+
+    src = project_path + "src"
+    if os.path.exists(src):
+        src_module = project_name + os.sep + "src"
+        module_list.append(src_module)
+
+    app_src = project_path + "app/src"
+    if os.path.exists(app_src):
+        app_src_module = project_name + os.sep + "app/src"
+        module_list.append(app_src_module)
+
     print("get all the module the locate in this project path: " + str(module_path_list))
+
     return module_path_list
 
 
