@@ -1,12 +1,13 @@
 class TaileString:
     def __init__(self, module_name: str,
                  simplified_chinese: str, english_us: str,
-                 page_start="", isStringArray=False,
+                 page_start="", isStringArray=False, android_src_path="",
                  android_id="", function_desc="",
                  default_lang="", ios_id="",
                  spanish="", french="", russia="",
                  korean="", japan="", germany=""):
         self.module_name = module_name
+        self.android_src_path = android_src_path
         self.page_start = page_start
         self.function_desc = function_desc
         self.isStringArray = isStringArray

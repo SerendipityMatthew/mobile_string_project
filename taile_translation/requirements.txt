@@ -2,3 +2,5 @@ xlrd==1.2.0
 xlwt==1.3.0
 pandas==1.1.3
 xlutils==2.0.0
+
+Deprecated~=1.2.12
