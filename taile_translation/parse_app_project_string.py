@@ -1,3 +1,4 @@
+# coding:utf-8
 # This is a sample Python script.
 
 # Press ⌃R to execute it or replace it with your code.
@@ -11,6 +12,7 @@ from xlrd.sheet import Sheet
 import platform
 
 from Taile_String import TaileString
+from parse_module import get_app_project_module
 
 
 def print_hi(name):
@@ -83,7 +85,16 @@ def parse_single_string(xml_file):
             single_xml_file_string_dict[child.attrib["name"]] = "|".join(string_array_item_list)
 
         else:
-            single_xml_file_string_dict[child.attrib["name"]] = str(child.text)
+            string_name_id = child.attrib["name"]
+            string_name_value = child.text
+            if xml_file.__contains__("openaccount_ui.xml"):
+                if xml_file.__contains__("page-account/"):
+                    print("=============== string_name_id = " + string_name_id)
+
+                    print("=============== child.text = " + child.text)
+            if string_name_value is None:
+                string_name_value = ""
+            single_xml_file_string_dict[string_name_id] = string_name_value
 
     return single_xml_file_string_dict
 
@@ -161,27 +172,27 @@ def parse_module_string(module_name: str, all_string_list):
         if isWindowsSystem():
             res_prefix = "res\\"
         if xml_file.__contains__(res_prefix + "values" + os.sep):
-            string_dict_none = parse_single_string(xml_file)
+            string_dict_none.update(parse_single_string(xml_file))
         if xml_file.__contains__(res_prefix + "values-zh-rCN"):
-            string_dict_zh_rCN = parse_single_string(xml_file)
+            string_dict_zh_rCN.update(parse_single_string(xml_file))
         if xml_file.__contains__(res_prefix + "values-en-rUS"):
-            string_dict_en_rUS = parse_single_string(xml_file)
+            string_dict_en_rUS.update(parse_single_string(xml_file))
         if xml_file.__contains__(res_prefix + "values-de-rDE"):
-            string_dict_de_rDE = parse_single_string(xml_file)
+            string_dict_de_rDE.update(parse_single_string(xml_file))
         if xml_file.__contains__(res_prefix + "values-fr-rFR"):
-            string_dict_fr_rFR = parse_single_string(xml_file)
+            string_dict_fr_rFR.update(parse_single_string(xml_file))
 
         if xml_file.__contains__(res_prefix + "values-es-rES"):
-            string_dict_es_rES = parse_single_string(xml_file)
+            string_dict_es_rES.update(parse_single_string(xml_file))
 
         if xml_file.__contains__(res_prefix + "values-ko-rKR"):
-            string_dict_ko_rKR = parse_single_string(xml_file)
+            string_dict_ko_rKR.update(parse_single_string(xml_file))
 
         if xml_file.__contains__(res_prefix + "values-ru-rRU"):
-            string_dict_ru_rRU = parse_single_string(xml_file)
+            string_dict_ru_rRU.update(parse_single_string(xml_file))
 
         if xml_file.__contains__(res_prefix + "values-ja-rJP"):
-            string_dict_ja_rJP = parse_single_string(xml_file)
+            string_dict_ja_rJP.update(parse_single_string(xml_file))
 
     # 从中选择出最大的
     print(string_dict_none.__len__())
@@ -831,6 +842,8 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
             sheet.write(index1, 6, android_string.default_lang)
             sheet.write(index1, 7, android_string.english_us)
             sheet.write(index1, 8, android_string.spanish)
+            if str(key).__eq__("page-account"):
+                print("write_code_string_excel_xls: android_string.germany = " + android_string.germany)
             sheet.write(index1, 9, android_string.germany)
             sheet.write(index1, 10, android_string.french)
             sheet.write(index1, 11, android_string.russia)
@@ -855,9 +868,12 @@ def parse_string():
     """
     # correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
+    for taile_string in android_code_string_list:
+        if taile_string.module_name.__eq__("page-account"):
+            print("hhhhhhhhh = " + taile_string.germany)
     sorted_string_map = sort_string_list(android_code_string_list)
     print("=============== fffffff  " + str(sorted_string_map.__len__()))
-    write_code_string_excel_xls("code_string_translation.xlsx", sorted_string_map)
+    write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)
 
 
 # Press the green button in the gutter to run the script.
