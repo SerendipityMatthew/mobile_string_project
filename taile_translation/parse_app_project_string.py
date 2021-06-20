@@ -91,7 +91,6 @@ def parse_single_string(xml_file):
                 if xml_file.__contains__("page-account/"):
                     print("=============== string_name_id = " + string_name_id)
 
-                    print("=============== child.text = " + child.text)
             if string_name_value is None:
                 string_name_value = ""
             single_xml_file_string_dict[string_name_id] = string_name_value
