@@ -73,13 +73,8 @@ page_share_module_list = []
 mxchip_component_module_list = []
 ilop_component_module_list = []
 mxapp_smartplus_android_common_module_list = []
-module_name_list = ["page-start", "page-scene",
-                    "page-ota", "page-message", "page-me",
-                    "page-device-add", "page-device-add-sdk",
-                    "page-account", "page-device",
-                    "mxchip-component", "ilop-component",
-                    "page-share", mxapp_smartplus_android_common
-                    ]
+import parse_module
+module_name_list = parse_module.get_app_project_module()
 all_string_list = parse_excel_file()
 
 for string_list in all_string_list:

@@ -26,13 +26,7 @@ mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
 mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
 # module_name_list = ["page-message"]
 
-module_name_list = ["page-start", "page-scene", "page-scan",
-                    "page-ota", "page-message", "page-me",
-                    "page-device-add", "page-device-add-sdk",
-                    "page-account", "page-device",
-                    "mxchip-component", "ilop-component",
-                    "page-share", mxapp_smartplus_android_common
-                    ]
+module_name_list = get_app_project_module()
 page_list = ["服务协议", "注册功能", "登录功能",
              "忘记/修改密码", "首页", "家庭管理",
              "智能", "我的", "个人设置",
