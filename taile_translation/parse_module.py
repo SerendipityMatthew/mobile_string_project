@@ -1,9 +1,9 @@
 import os
 
 # settings_gradle_file = "/Volumes/Mathew/code/mxchip/develop_deye_android/settings.gradle"
-common_path = "/Volumes/Mathew/code/mxchip"
+common_path = "/mnt/d/code/"
 project_name = "mxapp_smartplus_android"
-project_path = common_path + os.sep + project_name + os.sep
+project_path = common_path + project_name + os.sep
 
 
 def parse_app_modules(project_settings_path):
@@ -48,14 +48,16 @@ def get_app_project_module():
                 module_path_list.append(module_name)
 
     src = project_path + "src"
+    print("src ================ " + src)
     if os.path.exists(src):
+        print("common src path is exist")
         src_module = project_name + os.sep + "src"
-        module_list.append(src_module)
+        module_path_list.append(src_module)
 
     app_src = project_path + "app/src"
     if os.path.exists(app_src):
         app_src_module = project_name + os.sep + "app/src"
-        module_list.append(app_src_module)
+        module_path_list.append(app_src_module)
 
     print("get all the module the locate in this project path: " + str(module_path_list))
 
