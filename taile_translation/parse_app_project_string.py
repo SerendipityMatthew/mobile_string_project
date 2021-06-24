@@ -22,18 +22,14 @@ def print_hi(name):
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
-mx_app_file_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android"
-mxapp_smartplus_android_common = "mxapp_smartplus_android" + os.sep + "src"
+mx_app_file_path = "D:\code\mxapp_smartplus_android"
+
+project_name = "mxapp_smartplus_android"
+
+mxapp_smartplus_android_common = project_name + os.sep + "src"
 # module_name_list = ["page-message"]
 
 module_name_list = get_app_project_module()
-page_list = ["服务协议", "注册功能", "登录功能",
-             "忘记/修改密码", "首页", "家庭管理",
-             "智能", "我的", "个人设置",
-             "设置", "消息中心", "问题反馈",
-             "使用帮助", "设备共享", "关于我们",
-             "添加设备", "虚拟按钮",
-             ]
 
 
 def read_all_strings_xml():
@@ -418,26 +414,17 @@ def sort_string_list(all_string):
     排序字段  模块名称 ---> 启动页面
     
     """
-    if sorted_by_module:
-        for module_name in module_name_list:
-            page_start_string_list = []
-            print("sort_string_list: module_name =" + module_name)
-            for index in range(all_string.__len__()):
-                if all_string[index].module_name.__eq__(module_name):
-                    print("mmmmmmmm " + all_string[index].__str__())
-                    page_start_string_list.append(all_string[index])
-            page_start_string_list.sort()
-            all_string_dict[module_name] = page_start_string_list
-    else:
-        for page_name in page_list:
-            page_start_string_list = []
-            print("sort_string_list: page_name =" + page_name)
-            for index in range(all_string.__len__()):
-                if all_string[index].page_start.__eq__(page_name):
-                    print("page_name =  " + all_string[index].__str__())
-                    page_start_string_list.append(all_string[index])
-            page_start_string_list.sort()
-            all_string_dict[page_name] = page_start_string_list
+
+    for module_name in module_name_list:
+        page_start_string_list = []
+        print("sort_string_list: module_name =" + module_name)
+        for index in range(all_string.__len__()):
+            if all_string[index].module_name.__eq__(module_name):
+                print("mmmmmmmm " + all_string[index].__str__())
+                page_start_string_list.append(all_string[index])
+        page_start_string_list.sort()
+        all_string_dict[module_name] = page_start_string_list
+
     return all_string_dict
 
 

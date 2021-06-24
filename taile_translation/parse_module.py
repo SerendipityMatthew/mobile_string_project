@@ -1,9 +1,8 @@
 import os
 
-# settings_gradle_file = "/Volumes/Mathew/code/mxchip/develop_deye_android/settings.gradle"
-common_path = "/mnt/d/code/"
+project_path = "D:\code\mxapp_smartplus_android" + os.sep
 project_name = "mxapp_smartplus_android"
-project_path = common_path + project_name + os.sep
+mxapp_smartplus_android_common = project_name + os.sep + "src"
 
 
 def parse_app_modules(project_settings_path):
