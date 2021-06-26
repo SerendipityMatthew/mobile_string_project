@@ -47,6 +47,23 @@ def pretty_xml_to_file(source_file, file_path):
         f.write(pretty_xml_as_string)
 
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
+
+
 def generate_string_res(string_value_dict, file_path: str, file_name: str):
     """
     将 android 的字符串 写成 android的 strings.xml 的格式
@@ -55,18 +72,19 @@ def generate_string_res(string_value_dict, file_path: str, file_name: str):
 
     root = Element('resources')
     # 生成第一个子节点 head]
+    print("string_value_dict = " + str(string_value_dict))
     for name_key in string_value_dict:
         head = SubElement(root, 'string')
-        print("================ name_key = " + name_key)
         string_value = string_value_dict[name_key]
-        """
-         判断是否为 nan 值, 
-        """
+        # print("string_value = " + string_value)
         if pandas.isna(string_value):
+            print("string_value is nan = " + string_value)
             string_value = ""
-        print("================ string_value = " + str(string_value))
         head.attrib["name"] = name_key
-        head.text = string_value
+        string_value_str = str(string_value)
+
+        print("=========== string_value = " + string_value_str)
+        head.text = string_value_str
     tree = ElementTree(root)
     print("generate_string_res: tree = " + str(tree))
     print("generate_string_res: file_name = " + str(file_name))

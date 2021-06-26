@@ -9,9 +9,8 @@ string_excel_file = "code_string_translation.xls"
 
 
 def parse_excel_file():
-
     if not os.path.exists(string_excel_file):
-        print ("请先用 parse_app_project_string 程序生成 相应格式化的 excel 表格")
+        print("请先用 parse_app_project_string 程序生成 相应格式化的 excel 表格")
         return
 
     sheet = pandas.read_excel(io=string_excel_file)
@@ -31,28 +30,34 @@ def parse_excel_file():
         korean_str = ""
         japan_str = ""
         for column in columns:
+            column_value = row[column]
+            print("column_value = " + str(column_value))
+            if pandas.isna(column_value):
+                print("the column value is nan, we set the nan to space")
+
+                column_value = ""
             if "功能模块" == column:
-                module_name = row[column]
+                module_name = column_value
             if "android 资源id" == column:
-                android_id_str = row[column]
+                android_id_str = column_value
             if "中文" == column:
-                chinese_str = row[column]
+                chinese_str = column_value
             if "默认语言" == column:
-                default_lang_str = row[column]
+                default_lang_str = column_value
             if "美式英语" == column:
-                english_us = row[column]
+                english_us = column_value
             if "西班牙语" == column:
-                spanish_str = row[column]
+                spanish_str = column_value
             if "德语" == column:
-                germany_str = row[column]
+                germany_str = column_value
             if "法语" == column:
-                french_str = row[column]
+                french_str = column_value
             if "俄罗斯语" == column:
-                russia_str = row[column]
+                russia_str = column_value
             if "韩语" == column:
-                korean_str = row[column]
+                korean_str = column_value
             if "日语" == column:
-                japan_str = row[column]
+                japan_str = column_value
 
         taileString = TaileString(module_name, android_id=android_id_str, simplified_chinese=chinese_str,
                                   default_lang=default_lang_str,
@@ -72,9 +77,13 @@ import parse_module
 module_name_list = parse_module.get_app_project_module()
 all_string_list = parse_excel_file()
 
+for taile_string in all_string_list:
+    print(taile_string)
+
 
 def get_module_string(module_name: str, string_list: list):
     single_module_list = []
+    print("string_list = " + str(string_list))
     for string in string_list:
         if string.module_name.__eq__(module_name):
             single_module_list.append(string)
@@ -94,60 +103,74 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
     :param module_string_list: 这个模块的字符串 list
     :return:
     """
-    module_name = "app/" + module_name
-    simplified_chinese_dict = {}
-    for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.simplified_chinese
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-zh-rCN",
-                        file_name=xml_file_name)
+    module_name = parse_module.project_name + os.sep + "app" + os.sep + module_name
 
-    simplified_chinese_dict.clear()
+    string_dict = {}
     for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.english_us
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-en-rUS",
-                        file_name=xml_file_name)
+        string_dict[page_start_string.android_id] = page_start_string.simplified_chinese
+    print(" simplified_chinese_dict = " + str(string_dict.__len__()))
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-zh-rCN",
+                            file_name=xml_file_name)
 
-    simplified_chinese_dict.clear()
-    for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.korean
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-ko-rKR",
-                        file_name=xml_file_name)
+    string_dict.clear()
 
-    simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.japan
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-ja-rJP",
-                        file_name=xml_file_name)
+        string_dict[page_start_string.android_id] = page_start_string.english_us
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-en-rUS",
+                            file_name=xml_file_name)
 
-    simplified_chinese_dict.clear()
+    string_dict.clear()
     for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.germany
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-de-rDE",
-                        file_name=xml_file_name)
+        string_dict[page_start_string.android_id] = page_start_string.korean
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-ko-rKR",
+                            file_name=xml_file_name)
 
-    simplified_chinese_dict.clear()
+    string_dict.clear()
     for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.french
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-fr-rFR",
-                        file_name=xml_file_name)
+        string_dict[page_start_string.android_id] = page_start_string.japan
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-ja-rJP",
+                            file_name=xml_file_name)
 
-    simplified_chinese_dict.clear()
+    string_dict.clear()
     for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.french
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-ru-rRU",
-                        file_name=xml_file_name)
+        string_dict[page_start_string.android_id] = page_start_string.germany
 
-    simplified_chinese_dict.clear()
-    for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.spanish
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-es-rES",
-                        file_name=xml_file_name)
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-de-rDE",
+                            file_name=xml_file_name)
 
-    simplified_chinese_dict.clear()
+    string_dict.clear()
     for page_start_string in module_string_list:
-        simplified_chinese_dict[page_start_string.android_id] = page_start_string.default_lang
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values", file_name=xml_file_name)
+        string_dict[page_start_string.android_id] = page_start_string.french
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-fr-rFR",
+                            file_name=xml_file_name)
+
+    string_dict.clear()
+    for page_start_string in module_string_list:
+        string_dict[page_start_string.android_id] = page_start_string.french
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-ru-rRU",
+                            file_name=xml_file_name)
+    string_dict.clear()
+
+    for page_start_string in module_string_list:
+        string_dict[page_start_string.android_id] = page_start_string.spanish
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values-es-rES",
+                            file_name=xml_file_name)
+    string_dict.clear()
+
+    for page_start_string in module_string_list:
+        string_dict[page_start_string.android_id] = page_start_string.default_lang
+    if string_dict.__len__() != 0:
+        generate_string_res(string_dict, module_name + "/src/main/res/" + "values", file_name=xml_file_name)
 
 
 for name in module_name_list:
-    generate_module_string_to_xml(name, get_module_string(name, all_string_list))
+    module_string_list = get_module_string(name, all_string_list)
+    generate_module_string_to_xml(name, module_string_list)
