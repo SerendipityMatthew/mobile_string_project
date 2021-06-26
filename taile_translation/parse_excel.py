@@ -155,7 +155,7 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
 
     string_dict.clear()
     for page_start_string in module_string_list:
-        string_dict[page_start_string.android_id] = page_start_string.french
+        string_dict[page_start_string.android_id] = page_start_string.russia
     if string_dict.__len__() != 0:
         generate_string_res(string_dict, module_name + "/src/main/res/" + "values-ru-rRU",
                             file_name=xml_file_name)
