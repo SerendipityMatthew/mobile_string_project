@@ -77,7 +77,6 @@ def parse_single_string(xml_file):
         if str(child.tag).__eq__("string-array"):
             string_array_item_list = []
             for string_array_item in child.iter():
-                print("==== xxxxx yyyy ======= " + str(string_array_item.text))
                 string_array_item_list.append(string_array_item.text)
             single_xml_file_string_dict[child.attrib["name"]] = "|".join(string_array_item_list)
 
@@ -86,8 +85,6 @@ def parse_single_string(xml_file):
             string_name_value = child.text
             if string_name_value is None:
                 string_name_value = ""
-            print("parse_single_string: xml_file 111 = " + str(xml_file))
-            print("========string_name_value = " + string_name_value)
             single_xml_file_string_dict[string_name_id] = string_name_value
 
     return single_xml_file_string_dict
@@ -103,10 +100,6 @@ def is_the_language(xml_file, res_prefix, values_dir):
     """
     dash_last_index = values_dir.rindex("-")
     values_dir2 = values_dir[0:dash_last_index]
-    print("xml_file = " + xml_file)
-
-    print("res_prefix + values_dir = " + res_prefix + values_dir)
-    print("res_prefix + values_dir2 = " + res_prefix + values_dir2)
     if xml_file.__contains__(res_prefix + values_dir2):
         return True
     return False
@@ -132,7 +125,7 @@ def parse_module_string(module_name: str, all_string_list):
     file_separator = "/"
     if isWindowsSystem():
         file_separator = "\\"
-    print("===========ddddddddddddd========" + str(all_string_list.__len__()))
+
     for string_file in all_string_list:
         module_name_str = module_name + file_separator
 
@@ -219,18 +212,6 @@ def parse_module_string(module_name: str, all_string_list):
         if is_the_language(xml_file, res_prefix, "values-pt-rPT"):
             string_dict_pt_rPT.update(parse_single_string(xml_file))
 
-    # 从中选择出最大的
-    print(string_dict_none.__len__())
-    print("@@@@@@@@@@@@ " + str(string_dict_none))
-    # print(string_dict_en_rUS.__len__())
-    # print(string_dict_es_rES.__len__())
-    # print(string_dict_fr_rFR.__len__())
-    print("每个语言的字符串个个数")
-    print(string_dict_de_rDE.__len__())
-    print(string_dict_ko_rKR.__len__())
-    print(string_dict_ru_rRU.__len__())
-    print(string_dict_ja_rJP.__len__())
-
     for key in string_dict_none.keys():
         default_lang = string_dict_none[key]
         simplified_chinese = ""
@@ -241,7 +222,6 @@ def parse_module_string(module_name: str, all_string_list):
         korean = ""
         russia = ""
         japan = ""
-        print("--------------- " + key)
         try:
             simplified_chinese = string_dict_zh_rCN[key]
         except KeyError:
@@ -352,12 +332,9 @@ def write_excel_xls(path, sheet_name, value):
         print("key  = " + key + ", the length: " + str(single_module_name_list.__len__()))
         # 写入一个模块的资源
         module_count = single_module_name_list.__len__()
-        print("========= module_count = " + str(module_count))
         if module_count == 0:
             continue
         end = count + module_count
-        print("========= count = " + str(count))
-        print("========= end = " + str(end))
         sheet.write_merge(count, end - 1, 0, 0, key, style=cell_style)
         for col_index in range(single_module_name_list[0].__dict__.keys().__sizeof__()):
             sheet.col(col_index).width = 256 * 40
@@ -397,9 +374,7 @@ def write_excel_xls(path, sheet_name, value):
 def read_all_strings_from_android_xml():
     all_string_list = get_all_strings_xml_file()
     all_string = []
-    print("hhhhhhhh = " + str(module_name_list.__len__()))
     for module_name in module_name_list:
-        print("module_name = " + module_name)
         module_string_list = parse_module_string(module_name, all_string_list)
         for string in module_string_list:
             all_string.append(string)
@@ -411,12 +386,6 @@ def taile_string_comp(taile_str1: TaileString, taile_str2: TaileString):
     if taile_str1.page_start > taile_str2.page_start:
         return True
     return False
-
-
-"""
-对 list 内的元素, 进行排序, 
-"""
-sorted_by_module = True
 
 
 def sort_string_list(all_string):
@@ -510,41 +479,6 @@ def get_merged_cells_value(sheet: Sheet, row_index, col_index):
     return None
 
 
-def read_multination_string_excel(sheetName: str):
-    print("================ sheetName = " + sheetName)
-    with xlrd.open_workbook(multination_string_excel_file) as excel_workbook:
-        worksheet = excel_workbook.sheet_by_name(sheetName)
-        multination_string_list = []
-        for row_index in range(worksheet.nrows):
-            print("row_index = " + str(row_index))
-            if row_index == 0:
-                continue
-            module_name = ""
-            function_desc = ""
-            simplified_chinese = ""
-            english_us = ""
-            for col_index in range(worksheet.ncols):
-                cell_value = worksheet.cell_value(row_index, col_index)
-                print("cell_value = " + str(cell_value))
-                if col_index == 1:
-                    module_name = get_merged_cells_value(worksheet, row_index, col_index)
-                if col_index == 2:
-                    function_desc = cell_value
-                if col_index == 4:
-                    simplified_chinese = cell_value
-                if col_index == 5:
-                    english_us = cell_value
-
-            taileString = TaileString(module_name=module_name, function_desc=function_desc,
-                                      simplified_chinese=simplified_chinese, english_us=english_us)
-            multination_string_list.append(taileString)
-
-        for taileString in multination_string_list:
-            print(taileString)
-
-    return multination_string_list
-
-
 """
 读取最终版本的 字符串的excel 文件, 他有最全的字段
 """
@@ -619,113 +553,6 @@ def read_final_multination_string_company_excel(sheetName: str):
         return multination_string_list
 
 
-"""
-交叉对比 代码当中 string 和 正确翻译的 excel 文件中的 string
-"""
-
-collect_all_xxxx = []
-
-
-def cross_compare_the_then_get_one(android_code_string_list, correct_string,
-                                   code_module_name,
-                                   chinese_and_english: bool):
-    string_list = []
-    for code_string in android_code_string_list:
-        # if str(code_string.english_us).__eq__("Ok"):
-        #     continue
-        # if str(code_string.english_us).__eq__("OK"):
-        #     continue
-        # if str(code_string.english_us).__eq__("Cancel"):
-        #     continue
-        print("cross_compare_the_then_get_one = code_module_name = " + code_module_name)
-        print("cross_compare_the_then_get_one = code_string.module_name = " + code_string.module_name)
-        if code_string.module_name.__eq__(code_module_name):
-            print("===========================================")
-            print("=========================================== code_string.english_us = " + code_string.english_us)
-            """
-             对于特殊字符串, 去掉一些符号,然后比较, 比如去掉 中文的 "《"
-            """
-            modify_code_english = code_string.english_us \
-                .replace("《", "") \
-                .replace("？", "?") \
-                .replace("?", "") \
-                .replace("\n", "") \
-                .replace("  ", "") \
-                .replace("》", "") \
-                .replace("\\", "") \
-                .replace("\n", "") \
-                .replace("\t", "") \
-                .replace(", ", ",") \
-                .strip().lower()
-            modify_correct_english = correct_string.english_us \
-                .replace("《", "") \
-                .replace("》", "") \
-                .replace("？", "?") \
-                .replace("?", "") \
-                .replace("\n", "") \
-                .replace("  ", "") \
-                .replace("\\", "") \
-                .replace("\t", "") \
-                .replace("\n", "") \
-                .replace(", ", ",") \
-                .strip().lower()
-
-            modify_code_chinese = code_string.simplified_chinese.replace("《", "").replace("》", "").strip()
-            modify_correct_chinese = correct_string.simplified_chinese.replace("《", "").replace("》", "").strip()
-            print("modify_code_chinese = " + modify_code_chinese)
-            print("modify_correct_chinese = " + modify_correct_chinese)
-            print("modify_correct_chinese code_string = " + str(code_string))
-            print("modify_correct_chinese code_string.isStringArray = " + str(code_string.isStringArray))
-            print("english us   correct one:  modify_code_english = " + modify_code_english)
-            print("english us   correct one:  modify_correct_english = " + modify_correct_english)
-            if not code_string.isStringArray and modify_code_english.__eq__(modify_correct_english):
-                print("[[[[[[[[[[[[[[[[[[[[[[[[[")
-                if chinese_and_english:
-                    if modify_code_chinese.__eq__(modify_correct_chinese):
-                        collect_all_xxxx.append(correct_string)
-                        code_string.page_start = correct_string.module_name
-                        code_string.function_desc = correct_string.function_desc
-                        print("code_string = " + str(code_string))
-                        print("correct_string = " + str(correct_string))
-                        string_list.append(code_string)
-                else:
-                    collect_all_xxxx.append(correct_string)
-                    code_string.page_start = correct_string.module_name
-                    code_string.function_desc = correct_string.function_desc
-                    print("code_string = " + str(code_string))
-                    print("correct_string = " + str(correct_string))
-                    string_list.append(code_string)
-            elif code_string.isStringArray:
-                """
-                数组类型的
-                """
-                code_array_string = code_string.english_us.split("|")[0].strip()
-
-                if code_array_string.__eq__(correct_string.english_us):
-                    collect_all_xxxx.append(correct_string)
-                    code_string.page_start = correct_string.module_name
-                    code_string.function_desc = correct_string.function_desc
-                    print("code_string = " + str(code_string))
-                    string_list.append(code_string)
-            else:
-                """
-                    长句子, 比较第一句话是否相同
-                """
-                if modify_correct_english.__contains__("."):
-                    correct_first_line = modify_correct_english.split(".")[0].strip()
-                    code_first_line = modify_code_english.split(".")[0].strip()
-                    if code_first_line.__eq__(correct_first_line):
-                        collect_all_xxxx.append(correct_string)
-                        code_string.page_start = correct_string.module_name
-                        code_string.function_desc = correct_string.function_desc
-                        print("code_string = " + str(code_string))
-                        string_list.append(code_string)
-
-    print("++++++++++++++++++ " + str(string_list.__len__()))
-
-    return string_list
-
-
 def parse_array_string(single_module_list: list):
     single_module_array_list = []
     for string in single_module_list:
@@ -795,7 +622,6 @@ def parse_array_string(single_module_list: list):
 def write_code_string_excel_xls(path: str, sorted_string_map: dict):
     length = sorted_string_map.__len__()  # 获取需要写入数据的行数
     workbook = xlwt.Workbook()  # 新建一个工作簿
-    print("========== length " + str(length))
     sheet = workbook.add_sheet("code_string")  # 在工作簿中新建一个表格
     count = 0
     cell_style = module_name_cell_style()
@@ -809,8 +635,6 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
         if module_count == 0:
             continue
         end = count + module_count
-        print("========= count = " + str(count))
-        print("========= end = " + str(end))
         sheet.write_merge(count, end - 1, 0, 0, key, style=cell_style)
         for col_index in range(single_module_name_list[0].__dict__.keys().__sizeof__()):
             sheet.col(col_index).width = 256 * 40
@@ -820,7 +644,6 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
         other_style = other_cell_style()
         for index1 in range(count, end):
             android_string = single_module_name_list[index1 - count]
-            # print("index1 = " + str(index1))
             for col_index1 in range(12):
                 sheet.col(col_index1).width = 256 * 40
                 if col_index1 == 0:
@@ -860,8 +683,7 @@ def parse_string():
     android_code_string_list = read_all_strings_from_android_xml()
 
     sorted_string_map = sort_string_list(android_code_string_list)
-    print("=============== android_code_string_list  " + str(android_code_string_list.__len__()))
-    print("=============== fffffff  " + str(sorted_string_map.__len__()))
+
     write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)
 
 
