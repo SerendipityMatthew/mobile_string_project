@@ -84,12 +84,10 @@ def parse_single_string(xml_file):
         else:
             string_name_id = child.attrib["name"]
             string_name_value = child.text
-            if xml_file.__contains__("openaccount_ui.xml"):
-                if xml_file.__contains__("page-account/"):
-                    print("=============== string_name_id = " + string_name_id)
-
             if string_name_value is None:
                 string_name_value = ""
+            print("parse_single_string: xml_file 111 = " + str(xml_file))
+            print("========string_name_value = " + string_name_value)
             single_xml_file_string_dict[string_name_id] = string_name_value
 
     return single_xml_file_string_dict
@@ -103,11 +101,12 @@ def is_the_language(xml_file, res_prefix, values_dir):
     :param values_dir:  values-ko-rKR 形如这样的目录
     :return:
     """
-    values_dir2 = values_dir.split("-r")[0]
+    dash_last_index = values_dir.rindex("-")
+    values_dir2 = values_dir[0:dash_last_index]
     print("xml_file = " + xml_file)
-    print("values_dir2 = " + values_dir2)
-    if xml_file.__contains__(res_prefix + values_dir):
-        return True
+
+    print("res_prefix + values_dir = " + res_prefix + values_dir)
+    print("res_prefix + values_dir2 = " + res_prefix + values_dir2)
     if xml_file.__contains__(res_prefix + values_dir2):
         return True
     return False
@@ -194,7 +193,6 @@ def parse_module_string(module_name: str, all_string_list):
         if xml_file.__contains__(res_prefix + "values" + os.sep):
             string_dict_none.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-zh-rCN"):
-
             string_dict_zh_rCN.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-en-rUS"):
             string_dict_en_rUS.update(parse_single_string(xml_file))
