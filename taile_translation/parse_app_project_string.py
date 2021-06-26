@@ -510,29 +510,6 @@ def get_merged_cells_value(sheet: Sheet, row_index, col_index):
     return None
 
 
-"""
-从 correct_translation.xlsx 文件里读出所有的字符串
-服务协议  ----> mxapp_smartplus_android/src
-注册功能   ----> page-account
-登录功能   ----> ilop-component
-忘记/修改密码   ---> page-account
-首页     ----> ilop-component  page-device
-家庭管理  ----> page-device
-智能   -----> page-scene
-我的   -----> page-me
-个人设置 ----> page-me
-设置    ---> page-ota page-me ilop-component
-消息中心  ---->page-message
-问题反馈    --->ilop-component
-设备共享   -----> page-share
-使用帮助   ---->   page-me
-关于我们    ----> page-me  ilop-component
-添加设备   ----> page-device-add  ilop-component
-虚拟按钮   ----> page-scene
-设备详情
-"""
-
-
 def read_multination_string_excel(sheetName: str):
     print("================ sheetName = " + sheetName)
     with xlrd.open_workbook(multination_string_excel_file) as excel_workbook:
@@ -857,8 +834,6 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
             sheet.write(index1, 6, android_string.default_lang)
             sheet.write(index1, 7, android_string.english_us)
             sheet.write(index1, 8, android_string.spanish)
-            if str(key).__eq__("page-account"):
-                print("write_code_string_excel_xls: android_string.germany = " + android_string.germany)
             sheet.write(index1, 9, android_string.germany)
             sheet.write(index1, 10, android_string.french)
             sheet.write(index1, 11, android_string.russia)
