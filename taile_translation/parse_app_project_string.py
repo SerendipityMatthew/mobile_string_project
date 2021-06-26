@@ -56,7 +56,8 @@ def get_all_strings_xml_file():
                 if file_full_path.__contains__(".xml"):
                     if file_full_path.__contains__(values_string_path):
                         string_file_list.append(file_full_path)
-
+    for hello in string_file_list:
+        print("============= hello = " + hello)
     return string_file_list
 
 
@@ -94,6 +95,24 @@ def parse_single_string(xml_file):
     return single_xml_file_string_dict
 
 
+def is_the_language(xml_file, res_prefix, values_dir):
+    """
+
+    :param xml_file:
+    :param res_prefix:
+    :param values_dir:  values-ko-rKR 形如这样的目录
+    :return:
+    """
+    values_dir2 = values_dir.split("-r")[0]
+    print("xml_file = " + xml_file)
+    print("values_dir2 = " + values_dir2)
+    if xml_file.__contains__(res_prefix + values_dir):
+        return True
+    if xml_file.__contains__(res_prefix + values_dir2):
+        return True
+    return False
+
+
 def parse_module_string(module_name: str, all_string_list):
     page_start_string_list = []
     string_dict_ko_rKR = {}
@@ -105,6 +124,11 @@ def parse_module_string(module_name: str, all_string_list):
     string_dict_es_rES = {}
     string_dict_ru_rRU = {}
     string_dict_ja_rJP = {}
+    string_dict_da_rDK = {}
+    string_dict_fi_rFI = {}
+    string_dict_cs_rCZ = {}
+    string_dict_sl_rSI = {}
+    string_dict_pt_rPT = {}
     module_string_list = []
     file_separator = "/"
     if isWindowsSystem():
@@ -166,28 +190,36 @@ def parse_module_string(module_name: str, all_string_list):
         res_prefix = "res/"
         if isWindowsSystem():
             res_prefix = "res\\"
+
         if xml_file.__contains__(res_prefix + "values" + os.sep):
             string_dict_none.update(parse_single_string(xml_file))
-        if xml_file.__contains__(res_prefix + "values-zh-rCN"):
+        if is_the_language(xml_file, res_prefix, "values-zh-rCN"):
+
             string_dict_zh_rCN.update(parse_single_string(xml_file))
-        if xml_file.__contains__(res_prefix + "values-en-rUS"):
+        if is_the_language(xml_file, res_prefix, "values-en-rUS"):
             string_dict_en_rUS.update(parse_single_string(xml_file))
-        if xml_file.__contains__(res_prefix + "values-de-rDE"):
+        if is_the_language(xml_file, res_prefix, "values-de-rDE"):
             string_dict_de_rDE.update(parse_single_string(xml_file))
-        if xml_file.__contains__(res_prefix + "values-fr-rFR"):
+        if is_the_language(xml_file, res_prefix, "values-fr-rFR"):
             string_dict_fr_rFR.update(parse_single_string(xml_file))
-
-        if xml_file.__contains__(res_prefix + "values-es-rES"):
+        if is_the_language(xml_file, res_prefix, "values-es-rES"):
             string_dict_es_rES.update(parse_single_string(xml_file))
-
-        if xml_file.__contains__(res_prefix + "values-ko-rKR"):
+        if is_the_language(xml_file, res_prefix, "values-ko-rKR"):
             string_dict_ko_rKR.update(parse_single_string(xml_file))
-
-        if xml_file.__contains__(res_prefix + "values-ru-rRU"):
+        if is_the_language(xml_file, res_prefix, "values-ru-rRU"):
             string_dict_ru_rRU.update(parse_single_string(xml_file))
-
-        if xml_file.__contains__(res_prefix + "values-ja-rJP"):
+        if is_the_language(xml_file, res_prefix, "values-ja-rJP"):
             string_dict_ja_rJP.update(parse_single_string(xml_file))
+        if is_the_language(xml_file, res_prefix, "values-da-rDK"):
+            string_dict_da_rDK.update(parse_single_string(xml_file))
+        if is_the_language(xml_file, res_prefix, "values-fi-rFI"):
+            string_dict_ru_rRU.update(parse_single_string(xml_file))
+        if is_the_language(xml_file, res_prefix, "values-cs-rCZ"):
+            string_dict_ja_rJP.update(parse_single_string(xml_file))
+        if is_the_language(xml_file, res_prefix, "values-sl-rSI"):
+            string_dict_da_rDK.update(parse_single_string(xml_file))
+        if is_the_language(xml_file, res_prefix, "values-pt-rPT"):
+            string_dict_da_rDK.update(parse_single_string(xml_file))
 
     # 从中选择出最大的
     print(string_dict_none.__len__())
@@ -373,7 +405,6 @@ def read_all_strings_from_android_xml():
         module_string_list = parse_module_string(module_name, all_string_list)
         for string in module_string_list:
             all_string.append(string)
-
 
     return all_string
 
