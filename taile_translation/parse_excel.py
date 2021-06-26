@@ -1,9 +1,6 @@
-from xml.etree.ElementTree import ElementTree, SubElement, Element
-
 import pandas
 
 from Taile_String import TaileString
-from parse_app_project_string import mxapp_smartplus_android_common, sort_string_list
 from xml_utils import generate_string_res
 
 string_excel_file = "code_string_translation.xls"
@@ -58,125 +55,92 @@ def parse_excel_file():
     return list
 
 
-all_string_module_dict = dict()
-page_start_module_list = []
-page_ota_module_list = []
-page_message_module_list = []
-page_scene_module_list = []
-page_me_module_list = []
-page_account_module_list = []
-page_device_add_module_list = []
-page_device_add_sdk_module_list = []
-page_device_account_module_list = []
-page_device_module_list = []
-page_share_module_list = []
-mxchip_component_module_list = []
-ilop_component_module_list = []
-mxapp_smartplus_android_common_module_list = []
+"""
+根据模块的名称动态的生成变量名称:
+形如 page_start_string_list
+"""
+
 import parse_module
+
 module_name_list = parse_module.get_app_project_module()
 all_string_list = parse_excel_file()
 
-for string_list in all_string_list:
-    if string_list.module_name.__eq__("page-start"):
-        page_start_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-ota"):
-        page_ota_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-me"):
-        page_me_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-scene"):
-        page_scene_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-device-add"):
-        page_device_add_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-device-add-sdk"):
-        page_device_add_sdk_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-message"):
-        page_message_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-account"):
-        page_account_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-device"):
-        page_device_module_list.append(string_list)
-    if string_list.module_name.__eq__("page-share"):
-        page_share_module_list.append(string_list)
-    if string_list.module_name.__eq__("ilop-component"):
-        ilop_component_module_list.append(string_list)
-    if string_list.module_name.__eq__("mxchip-component"):
-        mxchip_component_module_list.append(string_list)
-    if string_list.module_name.__eq__(mxapp_smartplus_android_common):
-        mxapp_smartplus_android_common_module_list.append(string_list)
+
+def get_module_string(module_name: str, string_list: list):
+    single_module_list = []
+    for string in string_list:
+        if string.module_name.__eq__(module_name):
+            single_module_list.append(string)
+    return single_module_list
 
 
-def generate_module_string(module_name, module_string_list):
+def parse_all_string_list():
+    for module_name in module_name_list:
+        get_module_string(module_name, all_string_list)
+
+
+def generate_module_string_to_xml(module_name, module_string_list, xml_file_name="strings.xml"):
+    """
+    生成单个模块的字符串到 strings.xml 文件
+    :param xml_file_name:   写入到文件名称
+    :param module_name:  模块名称
+    :param module_string_list: 这个模块的字符串 list
+    :return:
+    """
+    module_name = "app/" + module_name
     simplified_chinese_dict = {}
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.simplified_chinese
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-zh-rCN",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.english_us
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-en-rUS",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.korean
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-ko-rKR",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.japan
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-ja-rJP",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.germany
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-de-rDE",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
-    for page_start_string in page_start_module_list:
+    for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.french
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-fr-rFR",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.french
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-ru-rRU",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.spanish
     generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values-es-rES",
-                        file_name="string.xml")
+                        file_name=xml_file_name)
 
     simplified_chinese_dict.clear()
     for page_start_string in module_string_list:
         simplified_chinese_dict[page_start_string.android_id] = page_start_string.default_lang
-    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values", file_name="string.xml")
+    generate_string_res(simplified_chinese_dict, module_name + "/src/main/res/" + "values", file_name=xml_file_name)
 
 
-module_string_dict = {}
-module_string_dict["page-start"] = page_start_module_list
-module_string_dict["page-ota"] = page_ota_module_list
-module_string_dict["page-me"] = page_me_module_list
-module_string_dict["page-device"] = page_device_module_list
-module_string_dict["page-device-add"] = page_device_add_module_list
-module_string_dict["page-message"] = page_message_module_list
-module_string_dict["page-scene"] = page_scene_module_list
-module_string_dict["page-account"] = page_account_module_list
-module_string_dict["page-share"] = page_share_module_list
-module_string_dict["page-device-add-sdk"] = page_device_add_sdk_module_list
-module_string_dict["ilop-component"] = ilop_component_module_list
-module_string_dict["mxchip-component"] = mxchip_component_module_list
-module_string_dict[mxapp_smartplus_android_common] = mxapp_smartplus_android_common_module_list
-
-for name in module_string_dict.keys():
-    generate_module_string(name, module_string_dict[name])
-print(page_share_module_list.__len__())
-print(page_device_add_sdk_module_list.__len__())
+for name in module_name_list:
+    generate_module_string_to_xml(name, get_module_string(name, all_string_list))

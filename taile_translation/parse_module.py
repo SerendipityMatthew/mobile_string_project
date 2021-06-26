@@ -1,6 +1,6 @@
 import os
 
-project_path = "D:\code\mxapp_smartplus_android" + os.sep
+project_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android" + os.sep
 project_name = "mxapp_smartplus_android"
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 
