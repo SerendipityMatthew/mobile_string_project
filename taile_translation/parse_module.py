@@ -1,7 +1,7 @@
 import os
 
 project_path = "/Volumes/Mathew/code/mxchip/develop_philips_health_android" + os.sep
-project_name = "develop_philips_health_android"
+project_name = project_path.split("/")[-2]
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 
 
