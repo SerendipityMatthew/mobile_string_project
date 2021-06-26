@@ -15,10 +15,6 @@ from Taile_String import TaileString
 from parse_module import get_app_project_module, project_path
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
@@ -30,7 +26,6 @@ mx_app_file_path = project_path
 project_name = mx_app_file_path.split(os.sep)[-1]
 
 mxapp_smartplus_android_common = project_name + os.sep + "src"
-# module_name_list = ["page-message"]
 
 module_name_list = get_app_project_module()
 
@@ -56,8 +51,6 @@ def get_all_strings_xml_file():
                 if file_full_path.__contains__(".xml"):
                     if file_full_path.__contains__(values_string_path):
                         string_file_list.append(file_full_path)
-    for hello in string_file_list:
-        print("============= hello = " + hello)
     return string_file_list
 
 
