@@ -12,6 +12,9 @@ def parse_excel_file():
     if not os.path.exists(string_excel_file):
         print("请先用 parse_app_project_string 程序生成 相应格式化的 excel 表格")
         return
+    if not os.path.isfile(string_excel_file):
+        print("code_string_translation.xls 不是一个文件")
+        return
 
     sheet = pandas.read_excel(io=string_excel_file)
 
