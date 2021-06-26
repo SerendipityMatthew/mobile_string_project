@@ -213,13 +213,13 @@ def parse_module_string(module_name: str, all_string_list):
         if is_the_language(xml_file, res_prefix, "values-da-rDK"):
             string_dict_da_rDK.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-fi-rFI"):
-            string_dict_ru_rRU.update(parse_single_string(xml_file))
+            string_dict_fi_rFI.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-cs-rCZ"):
-            string_dict_ja_rJP.update(parse_single_string(xml_file))
+            string_dict_cs_rCZ.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-sl-rSI"):
-            string_dict_da_rDK.update(parse_single_string(xml_file))
+            string_dict_sl_rSI.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-pt-rPT"):
-            string_dict_da_rDK.update(parse_single_string(xml_file))
+            string_dict_pt_rPT.update(parse_single_string(xml_file))
 
     # 从中选择出最大的
     print(string_dict_none.__len__())
