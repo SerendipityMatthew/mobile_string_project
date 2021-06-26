@@ -35,7 +35,7 @@ mxapp_smartplus_android_common = project_name + os.sep + "src"
 module_name_list = get_app_project_module()
 
 
-def read_all_strings_xml():
+def get_all_strings_xml_file():
     """
         过滤出所有的符合条件的 strings 文件
     :return:
@@ -47,9 +47,12 @@ def read_all_strings_xml():
             file_path = os.path.join(path, dir_name)
             for dir_path in os.listdir(file_path):
                 file_full_path = os.path.join(file_path, dir_path)
+                if file_full_path.__contains__(".git"):
+                    break
                 values_string_path = "main/res/values"
                 if isWindowsSystem():
                     values_string_path = "main\\res\\values"
+
                 if file_full_path.__contains__(".xml"):
                     if file_full_path.__contains__(values_string_path):
                         string_file_list.append(file_full_path)
@@ -265,7 +268,7 @@ def parse_module_string(module_name: str, all_string_list):
             germany=germany,
             japan=japan,
         )
-        print("taileString = " + str(taileString) + " android_id = " + key)
+        # print("taileString = " + str(taileString) + " android_id = " + key)
         module_string_list.append(taileString)
     return module_string_list
 
@@ -362,14 +365,15 @@ def write_excel_xls(path, sheet_name, value):
 
 
 def read_all_strings_from_android_xml():
-    all_string_list = read_all_strings_xml()
+    all_string_list = get_all_strings_xml_file()
     all_string = []
     print("hhhhhhhh = " + str(module_name_list.__len__()))
     for module_name in module_name_list:
-        print("bbbbbbbbbbbbb: module = " + str(module_name))
-        var = parse_module_string(module_name, all_string_list)
-        for hello in var:
-            all_string.append(hello)
+        print("module_name = " + module_name)
+        module_string_list = parse_module_string(module_name, all_string_list)
+        for string in module_string_list:
+            all_string.append(string)
+
 
     return all_string
 
@@ -420,10 +424,9 @@ def sort_string_list(all_string):
 
     for module_name in module_name_list:
         page_start_string_list = []
-        print("sort_string_list: module_name =" + module_name)
+        # print("sort_string_list: module_name =" + module_name)
         for index in range(all_string.__len__()):
             if all_string[index].module_name.__eq__(module_name):
-                print("mmmmmmmm " + all_string[index].__str__())
                 page_start_string_list.append(all_string[index])
         page_start_string_list.sort()
         all_string_dict[module_name] = page_start_string_list
@@ -851,10 +854,9 @@ def parse_string():
     """
     # correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
-    for taile_string in android_code_string_list:
-        if taile_string.module_name.__eq__("page-account"):
-            print("hhhhhhhhh = " + taile_string.germany)
+
     sorted_string_map = sort_string_list(android_code_string_list)
+    print("=============== android_code_string_list  " + str(android_code_string_list.__len__()))
     print("=============== fffffff  " + str(sorted_string_map.__len__()))
     write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)
 

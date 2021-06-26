@@ -1,7 +1,7 @@
 import os
 
 project_path = "/Volumes/Mathew/code/mxchip/develop_philips_health_android" + os.sep
-project_name = "mxapp_smartplus_android"
+project_name = "develop_philips_health_android"
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 
 
@@ -49,8 +49,11 @@ def get_app_project_module():
     for file_name in os.listdir(project_path):
         for module_name in module_list:
             if module_name.__contains__(":"):
-                module_path = module_name.replace(":", "/")
-                module_path_list.append(module_path)
+                module_name_group = module_name.split(":")
+                print("module_name = " + module_name)
+                if file_name.__eq__(module_name_group[1]):
+                    module_path = module_name.replace(":", "/")
+                    module_path_list.append(module_path)
             else:
                 if file_name.__eq__(module_name):
                     module_path_list.append(module_name)
@@ -68,6 +71,7 @@ def get_app_project_module():
         module_path_list.append(app_src_module)
 
     print("get all the module the locate in this project path: " + str(module_path_list))
+    print("get all the module the locate in this project path: " + str(module_path_list.__len__()))
 
     return module_path_list
 
