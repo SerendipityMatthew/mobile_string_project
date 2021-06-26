@@ -1,6 +1,6 @@
 import os
 
-project_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android" + os.sep
+project_path = "/Volumes/Mathew/code/mxchip/develop_philips_health_android" + os.sep
 project_name = "mxapp_smartplus_android"
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 
@@ -25,8 +25,13 @@ def parse_app_modules(project_settings_path):
                         module_list.append(trimmed_name)
 
             else:
-                module_name = line.split(":")[1]
-                module_name = module_name.replace("'", "").strip(" ").replace("\n", "")
+                print("=========  include line = " + line)
+                """
+                include ':mx-device-panel:mx-device-panel-kingkong'
+                include 'mx-lib-mqtt'
+                """
+                module_parent = line.split(" ")[1]
+                module_name = module_parent.replace("'", "").strip(" ").replace("\n", "")
                 module_list.append(module_name)
 
     print("get the app all module in settings.gradle file, " + str(module_list))
@@ -43,8 +48,12 @@ def get_app_project_module():
     module_path_list = []
     for file_name in os.listdir(project_path):
         for module_name in module_list:
-            if file_name.__eq__(module_name):
-                module_path_list.append(module_name)
+            if module_name.__contains__(":"):
+                module_path = module_name.replace(":", "/")
+                module_path_list.append(module_path)
+            else:
+                if file_name.__eq__(module_name):
+                    module_path_list.append(module_name)
 
     src = project_path + "src"
     print("src ================ " + src)

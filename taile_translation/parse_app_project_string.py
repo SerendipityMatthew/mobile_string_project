@@ -12,7 +12,7 @@ from xlrd.sheet import Sheet
 import platform
 
 from Taile_String import TaileString
-from parse_module import get_app_project_module
+from parse_module import get_app_project_module, project_path
 
 
 def print_hi(name):
@@ -22,9 +22,12 @@ def print_hi(name):
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
-mx_app_file_path = "D:\code\mxapp_smartplus_android"
+mx_app_file_path = project_path
 
-project_name = "mxapp_smartplus_android"
+"""
+项目的路径作为这个项目的名称
+"""
+project_name = mx_app_file_path.split(os.sep)[-1]
 
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 # module_name_list = ["page-message"]
