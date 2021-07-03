@@ -12,9 +12,8 @@ from xlrd.sheet import Sheet
 import platform
 
 from Taile_String import TaileString
+from parce_ios_strings import get_ios_project_string_dict
 from parse_module import get_app_project_module, project_path
-
-
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
@@ -114,6 +113,7 @@ def parse_module_string(module_name: str, all_string_list):
     string_dict_cs_rCZ = {}
     string_dict_sl_rSI = {}
     string_dict_pt_rPT = {}
+    string_dict_zh_rTW = {}
     module_string_list = []
     file_separator = "/"
     if isWindowsSystem():
@@ -204,6 +204,8 @@ def parse_module_string(module_name: str, all_string_list):
             string_dict_sl_rSI.update(parse_single_string(xml_file))
         if is_the_language(xml_file, res_prefix, "values-pt-rPT"):
             string_dict_pt_rPT.update(parse_single_string(xml_file))
+        if is_the_language(xml_file, res_prefix, "values-zh-rTW"):
+            string_dict_zh_rTW.update(parse_single_string(xml_file))
 
     for key in string_dict_none.keys():
         default_lang = string_dict_none[key]
@@ -251,6 +253,11 @@ def parse_module_string(module_name: str, all_string_list):
 
         try:
             japan = string_dict_ja_rJP[key]
+        except KeyError:
+            pass
+
+        try:
+            tw = string_dict_zh_rTW[key]
         except KeyError:
             pass
 
@@ -389,6 +396,7 @@ def sort_string_list(all_string):
         function_desc="功能描述",
         page_start="所在页面",
         android_id="android 资源id",
+        ios_module="ios 所在模块",
         ios_id="ios 资源id",
         simplified_chinese="中文",
         default_lang="默认语言",
@@ -621,10 +629,10 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
     # 遍历 所有的 字符串资源
     for key in sorted_string_map.keys():
         single_module_name_list = sorted_string_map[key]
-        print("key  = " + key + ", the length: " + str(single_module_name_list.__len__()))
+        # print("key  = " + key + ", the length: " + str(single_module_name_list.__len__()))
         # 写入一个模块的资源
         module_count = single_module_name_list.__len__()
-        print("========= module_count = " + str(module_count))
+        # print("========= module_count = " + str(module_count))
         if module_count == 0:
             continue
         end = count + module_count
@@ -643,18 +651,19 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
                     continue
                 sheet.col(col_index1).height = 40 * 40
             sheet.write(index1, 1, android_string.module_name)
-            sheet.write(index1, 2, android_string.function_desc)
-            sheet.write(index1, 3, android_string.android_id)
-            sheet.write(index1, 4, android_string.ios_id)
-            sheet.write(index1, 5, android_string.simplified_chinese)
-            sheet.write(index1, 6, android_string.default_lang)
-            sheet.write(index1, 7, android_string.english_us)
-            sheet.write(index1, 8, android_string.spanish)
-            sheet.write(index1, 9, android_string.germany)
-            sheet.write(index1, 10, android_string.french)
-            sheet.write(index1, 11, android_string.russia)
-            sheet.write(index1, 12, android_string.korean)
-            sheet.write(index1, 13, android_string.japan)
+            sheet.write(index1, 2, android_string.ios_module)
+            sheet.write(index1, 3, android_string.function_desc)
+            sheet.write(index1, 4, android_string.android_id)
+            sheet.write(index1, 5, android_string.ios_id)
+            sheet.write(index1, 6, android_string.simplified_chinese)
+            sheet.write(index1, 7, android_string.default_lang)
+            sheet.write(index1, 8, android_string.english_us)
+            sheet.write(index1, 9, android_string.spanish)
+            sheet.write(index1, 10, android_string.germany)
+            sheet.write(index1, 11, android_string.french)
+            sheet.write(index1, 12, android_string.russia)
+            sheet.write(index1, 13, android_string.korean)
+            sheet.write(index1, 14, android_string.japan)
 
         count = end
         # sheet.write_merge(module_count, module_count - 1, 0, 0, single_module_name_list[i].module_name)
@@ -674,7 +683,30 @@ def parse_string():
     """
     # correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
+    ios_string_dict = get_ios_project_string_dict()
+    print("============== ios_string_dict = " + str(ios_string_dict.__len__()))
+    print("============== android_code_string_list = " + str(android_code_string_list.__len__()))
+    # merge_ios_android_string_list = []
+    for string_index in range(android_code_string_list.__len__()):
+        android_string = android_code_string_list[string_index]
+        for ios_module in ios_string_dict.keys():
+            module_string_list = ios_string_dict.get(ios_module)
+            for ios_string in module_string_list:
+                ios_compare_string = ios_string.value.strip()
 
+                android_compare_string = android_string.default_lang.strip()
+                if android_compare_string.__len__() == 0:
+                    android_compare_string = android_string.simplified_chinese
+                print("android_compare_string = " + str(android_compare_string) + ", ios_compare_string = " + str(
+                    ios_compare_string))
+                if android_compare_string == ios_compare_string:
+                    android_string.ios_module = ios_string.module_name
+                    android_string.ios_id = ios_string.string_id
+                    android_code_string_list[string_index] = android_string
+
+                else:
+                    android_zh_string = android_string.simplified_chinese
+                    android_zh_string.__contains__(",")
     sorted_string_map = sort_string_list(android_code_string_list)
 
     write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)
@@ -682,8 +714,4 @@ def parse_string():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # read_all_strings_generate_excel(
     parse_string()
-    # correct_string_list = read_final_multination_string_company_excel("taile")
-    # for xxx in correct_string_list:
-    #     print(xxx)

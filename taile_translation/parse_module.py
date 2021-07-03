@@ -1,7 +1,7 @@
 import os
 
-project_path = "/Volumes/Mathew/code/android_app/duckduckgoAndroid" + os.sep
-project_name = project_path.split("/")[-2]
+project_path = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android" + os.sep
+project_name = project_path.split(os.sep)[-2]
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 
 
@@ -25,7 +25,7 @@ def parse_app_modules(project_settings_path):
                         module_list.append(trimmed_name)
 
             else:
-                print("=========  include line = " + line)
+                # print("=========  include line = " + line)
                 """
                 include ':mx-device-panel:mx-device-panel-kingkong'
                 include 'mx-lib-mqtt'
