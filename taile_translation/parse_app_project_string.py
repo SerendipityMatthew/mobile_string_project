@@ -12,7 +12,7 @@ from xlrd.sheet import Sheet
 import platform
 
 from Taile_String import TaileString
-from parce_ios_strings import get_ios_project_string_dict
+from parse_ios_strings import get_ios_project_string_dict
 from parse_module import get_app_project_module, project_path
 
 multination_string_excel_file = "correct_translation.xlsx"
