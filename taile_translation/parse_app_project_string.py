@@ -694,9 +694,9 @@ def parse_string():
             for ios_string in module_string_list:
                 ios_compare_string = ios_string.value.strip()
 
-                android_compare_string = android_string.default_lang.strip()
+                android_compare_string = android_string.english_us.strip()
                 if android_compare_string.__len__() == 0:
-                    android_compare_string = android_string.simplified_chinese
+                    android_compare_string = android_string.default_lang
                 print("android_compare_string = " + str(android_compare_string) + ", ios_compare_string = " + str(
                     ios_compare_string))
                 if android_compare_string == ios_compare_string:

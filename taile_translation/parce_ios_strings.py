@@ -2,7 +2,7 @@ import os
 
 from ios_string import IOS_String
 
-ios_app_string_path = "/Users/Matthew/Downloads/Ilop-Translations/Ilop-Translations"
+ios_app_string_path = "/mnt/c/Users/wanji/Downloads/iLop-English/iLop-English"
 
 
 def get_all_strings_xml_file(module_name, module_string_path):
@@ -53,13 +53,16 @@ string_file_dict = {}
 
 def read_strings_from_file(module_name: str, file_path):
     ios_string_list = []
-    with open(file=file_path) as f:
+    with open(file=file_path, encoding="utf-8") as f:
         file_string = f.readlines()
 
         for string in file_string:
 
             if string.strip().__eq__(""):
                 continue
+            if not string.startswith("\""):
+                continue
+            print(" string = " + string)
             ios_string_id = string.split("\" ")[0].replace("\"", "")
             ios_string_value = string.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
             ios_string = IOS_String(module_name, ios_string_id, ios_string_value)
@@ -84,7 +87,6 @@ def get_ios_project_string_dict():
         ios_module_string_dict[module] = module_string_list
     return ios_module_string_dict
 
-
 # ios_module_string = get_ios_project_string_dict()
 # print("==================================")
 # IMSIotSmart_list = []
@@ -92,4 +94,3 @@ def get_ios_project_string_dict():
 #     list_d = ios_module_string.get(module_name)
 #     for d in list_d:
 #         print("ddddd = " + str(d))
-
