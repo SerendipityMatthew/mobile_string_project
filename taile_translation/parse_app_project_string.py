@@ -620,6 +620,22 @@ def parse_array_string(single_module_list: list):
     return single_module_array_list
 
 
+def setStyle():
+    style = xlwt.XFStyle()  # 初始化样式
+
+    font = xlwt.Font()  # 为样式创建字体
+    # 字体类型：比如宋体、仿宋也可以是汉仪瘦金书繁
+    font.name = 'Times New Roman'
+    # 设置字体颜色
+    font.colour_index = 14
+    # 字体大小
+    font.height = 200
+    # 定义格式
+    style.font = font
+
+    return style
+
+
 def write_code_string_excel_xls(path: str, sorted_string_map: dict):
     length = sorted_string_map.__len__()  # 获取需要写入数据的行数
     workbook = xlwt.Workbook()  # 新建一个工作簿
@@ -643,6 +659,7 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
                 continue
             sheet.col(col_index).height = 40 * 40
         other_style = other_cell_style()
+        fontStyle = setStyle()
         for index1 in range(count, end):
             android_string = single_module_name_list[index1 - count]
             for col_index1 in range(12):
@@ -650,20 +667,23 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
                 if col_index1 == 0:
                     continue
                 sheet.col(col_index1).height = 40 * 40
-            sheet.write(index1, 1, android_string.module_name)
-            sheet.write(index1, 2, android_string.ios_module)
-            sheet.write(index1, 3, android_string.function_desc)
-            sheet.write(index1, 4, android_string.android_id)
-            sheet.write(index1, 5, android_string.ios_id)
-            sheet.write(index1, 6, android_string.simplified_chinese)
-            sheet.write(index1, 7, android_string.default_lang)
-            sheet.write(index1, 8, android_string.english_us)
-            sheet.write(index1, 9, android_string.spanish)
-            sheet.write(index1, 10, android_string.germany)
-            sheet.write(index1, 11, android_string.french)
-            sheet.write(index1, 12, android_string.russia)
-            sheet.write(index1, 13, android_string.korean)
-            sheet.write(index1, 14, android_string.japan)
+            sheet.write(index1, 0, android_string.module_name)
+            sheet.write(index1, 1, android_string.ios_module)
+            sheet.write(index1, 2, android_string.android_id)
+            sheet.write(index1, 3, android_string.ios_id)
+            sheet.write(index1, 4, android_string.simplified_chinese)
+            sheet.write(index1, 5, android_string.default_lang)
+            if android_string.ios_id.strip() == "":
+                sheet.write(index1, 6, android_string.english_us, fontStyle)
+            else:
+                sheet.write(index1, 6, android_string.english_us)
+
+            sheet.write(index1, 7, android_string.spanish)
+            sheet.write(index1, 8, android_string.germany)
+            sheet.write(index1, 9, android_string.french)
+            sheet.write(index1, 10, android_string.russia)
+            sheet.write(index1, 11, android_string.korean)
+            sheet.write(index1, 12, android_string.japan)
 
         count = end
         # sheet.write_merge(module_count, module_count - 1, 0, 0, single_module_name_list[i].module_name)
