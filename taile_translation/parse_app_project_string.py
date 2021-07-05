@@ -636,7 +636,7 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
         if module_count == 0:
             continue
         end = count + module_count
-        sheet.write_merge(count, end - 1, 0, 0, key, style=cell_style)
+        # sheet.write_merge(count, end - 1, 0, 0, key, style=cell_style)
         for col_index in range(single_module_name_list[0].__dict__.keys().__sizeof__()):
             sheet.col(col_index).width = 256 * 40
             if col_index == 0:
@@ -697,14 +697,15 @@ def parse_string():
                 android_compare_string = android_string.english_us.strip()
                 if android_compare_string.__len__() == 0:
                     android_compare_string = android_string.default_lang
-                print("android_compare_string = " + str(android_compare_string) + ", ios_compare_string = " + str(
-                    ios_compare_string))
-                if android_compare_string == ios_compare_string:
+
+                if android_compare_string.lower() == ios_compare_string.lower():
                     android_string.ios_module = ios_string.module_name
                     android_string.ios_id = ios_string.string_id
                     android_code_string_list[string_index] = android_string
 
                 else:
+                    print("android_compare_string = " + str(android_compare_string) + ", ios_compare_string = " + str(
+                        ios_compare_string))
                     android_zh_string = android_string.simplified_chinese
                     android_zh_string.__contains__(",")
     sorted_string_map = sort_string_list(android_code_string_list)

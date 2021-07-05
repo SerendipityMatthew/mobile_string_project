@@ -62,7 +62,6 @@ def read_strings_from_file(module_name: str, file_path):
                 continue
             if not string.startswith("\""):
                 continue
-            print(" string = " + string)
             ios_string_id = string.split("\" ")[0].replace("\"", "")
             ios_string_value = string.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
             ios_string = IOS_String(module_name, ios_string_id, ios_string_value)
