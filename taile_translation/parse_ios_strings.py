@@ -30,7 +30,12 @@ def get_all_strings_xml_file(module_name, module_string_path):
             for dir_path in os.listdir(file_path):
                 file_full_path = os.path.join(file_path, dir_path)
                 print("the strings file of the project, file_full_path " + str(file_full_path))
-                if file_full_path.endswith(".strings") and (file_full_path.__contains__("zh-CN.lproj") or file_full_path.__contains__("zh-Hans.lproj")) :
+                if file_full_path.endswith(".strings") and (file_full_path.__contains__("zh-CN.lproj")
+                                                            or file_full_path.__contains__("zh-Hans.lproj")
+                                                            or file_full_path.__contains__("zh.lproj")
+                                                            or file_full_path.__contains__("zh_CN.lproj")
+
+                ) :
                     string_file_listA.append(file_full_path)
     print("the strings file of the project, total " + str(string_file_listA.__len__()))
     return string_file_listA
