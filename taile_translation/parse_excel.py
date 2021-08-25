@@ -5,7 +5,7 @@ import pandas
 from Taile_String import TaileString
 from xml_utils import generate_string_res
 
-string_excel_file = "code_string_translation.xls"
+string_excel_file = "code_string_translation_01.xls"
 
 
 def parse_excel_file():
@@ -13,7 +13,7 @@ def parse_excel_file():
         print("请先用 parse_app_project_string 程序生成 相应格式化的 excel 表格")
         return
     if not os.path.isfile(string_excel_file):
-        print("code_string_translation.xls 不是一个文件")
+        print("code_string_translation_01.xls 不是一个文件")
         return
 
     sheet = pandas.read_excel(io=string_excel_file)

@@ -62,8 +62,8 @@ def isWindowsSystem():
 
 def parse_single_string(xml_file):
     single_xml_file_string_dict = {}
-    xml_file_doc = ElementTree.parse(xml_file)
     print("parse_single_string: xml_file = " + str(xml_file))
+    xml_file_doc = ElementTree.parse(xml_file)
 
     for child in xml_file_doc.getroot():
         if str(child.tag).__eq__("string-array"):
@@ -420,7 +420,7 @@ def sort_string_list(all_string):
     排序字段  模块名称 ---> 启动页面
     
     """
-
+    module_name_list.append("----")
     for module_name in module_name_list:
         page_start_string_list = []
         # print("sort_string_list: module_name =" + module_name)
@@ -636,6 +636,22 @@ def setStyle():
     return style
 
 
+def setStyleFontColor():
+    style = xlwt.XFStyle()  # 初始化样式
+
+    font = xlwt.Font()  # 为样式创建字体
+    # 字体类型：比如宋体、仿宋也可以是汉仪瘦金书繁
+    font.name = 'Times New Roman'
+    # 设置字体颜色
+    font.colour_index = 39
+    # 字体大小
+    font.height = 200
+    # 定义格式
+    style.font = font
+
+    return style
+
+
 def write_code_string_excel_xls(path: str, sorted_string_map: dict):
     length = sorted_string_map.__len__()  # 获取需要写入数据的行数
     workbook = xlwt.Workbook()  # 新建一个工作簿
@@ -660,6 +676,7 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
             sheet.col(col_index).height = 40 * 40
         other_style = other_cell_style()
         fontStyle = setStyle()
+        fontColorStyle = setStyleFontColor()
         for index1 in range(count, end):
             android_string = single_module_name_list[index1 - count]
             for col_index1 in range(12):
@@ -670,7 +687,13 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
             sheet.write(index1, 0, android_string.module_name)
             sheet.write(index1, 1, android_string.ios_module)
             sheet.write(index1, 2, android_string.android_id)
-            sheet.write(index1, 3, android_string.ios_id)
+
+            # sheet.write(index1, 3, android_string.ios_id)
+            if android_string.module_name.strip() == "----":
+                sheet.write(index1, 3, android_string.ios_id, fontColorStyle)
+            else:
+                sheet.write(index1, 3, android_string.ios_id)
+
             sheet.write(index1, 4, android_string.simplified_chinese)
             sheet.write(index1, 5, android_string.default_lang)
             if android_string.ios_id.strip() == "":
@@ -704,23 +727,28 @@ def parse_string():
     # correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
     ios_string_dict = get_ios_project_string_dict()
+    for hello in ios_string_dict.keys():
+        print("jjjjjjjjjjjjj = " + str(ios_string_dict.get(hello).__len__()))
     print("============== ios_string_dict = " + str(ios_string_dict.__len__()))
     print("============== android_code_string_list = " + str(android_code_string_list.__len__()))
-    # merge_ios_android_string_list = []
+    merge_ios_android_string_list = []
     for string_index in range(android_code_string_list.__len__()):
         android_string = android_code_string_list[string_index]
         for ios_module in ios_string_dict.keys():
             module_string_list = ios_string_dict.get(ios_module)
+            print("============== module_string_list len = " + str(module_string_list.__len__()))
+
             for ios_string in module_string_list:
                 ios_compare_string = ios_string.value.strip()
 
-                android_compare_string = android_string.english_us.strip()
+                android_compare_string = android_string.simplified_chinese.strip()
                 if android_compare_string.__len__() == 0:
                     android_compare_string = android_string.default_lang
 
                 if android_compare_string.lower() == ios_compare_string.lower():
                     android_string.ios_module = ios_string.module_name
                     android_string.ios_id = ios_string.string_id
+                    merge_ios_android_string_list.append(ios_string)
                     android_code_string_list[string_index] = android_string
 
                 else:
@@ -728,6 +756,22 @@ def parse_string():
                         ios_compare_string))
                     android_zh_string = android_string.simplified_chinese
                     android_zh_string.__contains__(",")
+    all_ios_string_list = []
+    for ios_module in ios_string_dict.keys():
+        module_string_list = ios_string_dict.get(ios_module)
+        for ios_string in module_string_list:
+            all_ios_string_list.append(ios_string)
+    # list(set(listB).difference(set(listA)))
+
+    diff_ios_list = list(set(all_ios_string_list).difference(set(merge_ios_android_string_list)))
+    print("============== diff_ios_list = " + str(diff_ios_list.__len__()))
+    for ios_string in diff_ios_list:
+        ios_string_convert = TaileString(module_name="----",
+                                         ios_module=ios_string.module_name,
+                                         simplified_chinese=ios_string.value,
+                                         ios_id=ios_string.string_id, english_us="")
+        android_code_string_list.append(ios_string_convert)
+
     sorted_string_map = sort_string_list(android_code_string_list)
 
     write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)

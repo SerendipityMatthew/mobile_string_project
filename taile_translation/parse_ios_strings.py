@@ -7,7 +7,7 @@ from ios_string import IOS_String
 """
 只获取该项目的英文翻译的字段和中文翻译的字段, 然后基于英文和中文去对比和比较
 """
-ios_app_project_path = "D:\\github\\firefox-ios"
+ios_app_project_path = "/mnt/d/code/mxapp_smartplus_ios"
 
 
 def get_all_strings_xml_file(module_name, module_string_path):
@@ -29,7 +29,8 @@ def get_all_strings_xml_file(module_name, module_string_path):
             file_path = os.path.join(path, dir_name)
             for dir_path in os.listdir(file_path):
                 file_full_path = os.path.join(file_path, dir_path)
-                if file_full_path.endswith(".strings") and file_full_path.__contains__("zh-CN.lproj"):
+                print("the strings file of the project, file_full_path " + str(file_full_path))
+                if file_full_path.endswith(".strings") and (file_full_path.__contains__("zh-CN.lproj") or file_full_path.__contains__("zh-Hans.lproj")) :
                     string_file_listA.append(file_full_path)
     print("the strings file of the project, total " + str(string_file_listA.__len__()))
     return string_file_listA
@@ -77,8 +78,15 @@ def read_strings_from_file(module_name: str, file_path):
                 continue
             if not string.startswith("\""):
                 continue
-            ios_string_id = string.split("\" ")[0].replace("\"", "")
-            ios_string_value = string.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
+            ios_string_id = ""
+            ios_string_value = ""
+            if str(string).__contains__("\" = \""): # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的
+                ios_string_id = string.split("\" ")[0].replace("\"", "")
+                ios_string_value = string.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
+            if str(string).__contains__("\"=\""): # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
+                ios_string_id = string.split("\"=\"")[0].replace("\"", "")
+                ios_string_value = string.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
+            print("================= ios string value  = " + str(string) + " file_path = " + str(file_path))
             ios_string = IOS_String(module_name, ios_string_id, ios_string_value, project_file_path)
             ios_string_list.append(ios_string)
     for ios_string in ios_string_list:
@@ -116,8 +124,8 @@ def strip_null_value_string_dict():
     return module_string
 
 
-string_dict = strip_null_value_string_dict()
-for module_name in string_dict.keys():
-    list_d = string_dict.get(module_name)
-    for d in list_d:
-        print("================= " + str(d))
+# string_dict = strip_null_value_string_dict()
+# for module_name in string_dict.keys():
+#     list_d = string_dict.get(module_name)
+#     for d in list_d:
+#         print("================= " + str(d))

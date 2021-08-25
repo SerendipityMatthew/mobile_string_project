@@ -41,8 +41,8 @@ class TaileString:
         if self.module_name < other.module_name:
             return True
         if self.module_name == other.module_name:
-            if self.page_start is None:
+            if self.ios_id is None:
                 return False
-            if self.page_start < other.page_start:
+            if self.ios_id < other.ios_id:
                 return True
             return False
