@@ -5,14 +5,13 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import os as os
 import xml.etree.cElementTree as ElementTree
-
 import xlrd
 import xlwt
 from xlrd.sheet import Sheet
 import platform
 
 from Taile_String import TaileString
-from parse_ios_strings import get_ios_project_string_dict
+from parse_ios_strings import get_ios_project_string_dict, get_ios_project_string_dict_all
 from parse_module import get_app_project_module, project_path
 
 multination_string_excel_file = "correct_translation.xlsx"
@@ -726,14 +725,60 @@ def parse_string():
     """
     # correct_string_list = read_multination_string_excel(sheetName='Sheet1')
     android_code_string_list = read_all_strings_from_android_xml()
+    return android_code_string_list
+
+
+def is_contains_chinese(strs):
+    for _char in strs:
+        if '\u4e00' <= _char <= '\u9fa5':
+            return True
+    return False
+
+
+def merge_same_string():
+    """
+    android 相同的中文相同字符串合并
+    :return:
+    """
+    android_strings_list = parse_string()
+    taile_string_dict = {}
+    for taile_string in android_strings_list:
+        print("=========== " + str(taile_string))
+        if is_contains_chinese(taile_string.default_lang) is False:
+            continue
+
+        try:
+            same_key_value = taile_string_dict[taile_string.default_lang]
+        except:
+            same_key_value = None
+        print("------------- " + taile_string.default_lang + " ------ " +
+              str(same_key_value))
+        if same_key_value is None:
+            taile_string_dict[taile_string.default_lang] = [taile_string]
+        else:
+            # 这么写是错误的
+            # taile_string_dict[taile_string.default_lang] = same_key_value.append(
+            #     taile_string)
+            taile_string_dict[taile_string.default_lang].append(
+                taile_string)
+    for key in taile_string_dict.keys():
+        print("========= key = " + str(key) + " value = " + str(taile_string_dict.get(key)))
+
+
+def get_all_ios_string():
+    get_ios_project_string_dict_all()
+
+
+def hello():
+    android_string_list = parse_string()
     ios_string_dict = get_ios_project_string_dict()
     for hello in ios_string_dict.keys():
         print("jjjjjjjjjjjjj = " + str(ios_string_dict.get(hello).__len__()))
     print("============== ios_string_dict = " + str(ios_string_dict.__len__()))
-    print("============== android_code_string_list = " + str(android_code_string_list.__len__()))
+    print("============== android_code_string_list = " + str(android_string_list.__len__()))
     merge_ios_android_string_list = []
-    for string_index in range(android_code_string_list.__len__()):
-        android_string = android_code_string_list[string_index]
+    for string_index in range(android_string_list.__len__()):
+        android_string = android_string_list[string_index]
         for ios_module in ios_string_dict.keys():
             module_string_list = ios_string_dict.get(ios_module)
             print("============== module_string_list len = " + str(module_string_list.__len__()))
@@ -749,7 +794,7 @@ def parse_string():
                     android_string.ios_module = ios_string.module_name
                     android_string.ios_id = ios_string.string_id
                     merge_ios_android_string_list.append(ios_string)
-                    android_code_string_list[string_index] = android_string
+                    android_string_list[string_index] = android_string
 
                 else:
                     print("android_compare_string = " + str(android_compare_string) + ", ios_compare_string = " + str(
@@ -770,13 +815,13 @@ def parse_string():
                                          ios_module=ios_string.module_name,
                                          simplified_chinese=ios_string.value,
                                          ios_id=ios_string.string_id, english_us="")
-        android_code_string_list.append(ios_string_convert)
+        android_string_list.append(ios_string_convert)
 
-    sorted_string_map = sort_string_list(android_code_string_list)
+    sorted_string_map = sort_string_list(android_string_list)
 
     write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    parse_string()
+    get_all_ios_string()

@@ -5,7 +5,7 @@ import pandas
 from Taile_String import TaileString
 from xml_utils import generate_string_res
 
-string_excel_file = "code_string_translation_01.xls"
+string_excel_file = "code_string_translation.xls"
 
 
 def parse_excel_file():
@@ -77,25 +77,33 @@ def parse_excel_file():
 
 import parse_module
 
-module_name_list = parse_module.get_app_project_module()
 all_string_list = parse_excel_file()
 
+
+#
 for taile_string in all_string_list:
-    print(taile_string)
+    print("taile_string = " + str(taile_string))
 
 
 def get_module_string(module_name: str, string_list: list):
     single_module_list = []
     print("string_list = " + str(string_list))
     for string in string_list:
-        if string.module_name.__eq__(module_name):
+        if string is not None and string.module_name.__eq__(module_name):
             single_module_list.append(string)
     return single_module_list
 
 
 def parse_all_string_list():
+    temp_module_name_list = []
+    for string in all_string_list:
+        temp_module_name_list.append(string.module_name)
+    module_name_list = list(set(temp_module_name_list))
     for module_name in module_name_list:
         get_module_string(module_name, all_string_list)
+    print("string_list = module_name_list = " + str(module_name_list))
+
+    return module_name_list
 
 
 def generate_module_string_to_xml(module_name, module_string_list, xml_file_name="strings.xml"):
@@ -173,6 +181,8 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
     if string_dict.__len__() != 0:
         generate_string_res(string_dict, module_name + "/src/main/res/" + "values", file_name=xml_file_name)
 
+
+module_name_list = parse_all_string_list()
 
 for name in module_name_list:
     module_string_list = get_module_string(name, all_string_list)

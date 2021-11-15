@@ -7,7 +7,7 @@ from ios_string import IOS_String
 """
 只获取该项目的英文翻译的字段和中文翻译的字段, 然后基于英文和中文去对比和比较
 """
-ios_app_project_path = "/mnt/d/code/mxapp_smartplus_ios"
+ios_app_project_path = "/mnt/d/code/yongzheng/yongzheng"
 
 
 def get_all_strings_xml_file(module_name, module_string_path):
@@ -25,18 +25,32 @@ def get_all_strings_xml_file(module_name, module_string_path):
     app_file = os.walk(module_string_path + os.sep + module_name)
     string_file_listA = []
     for path, dir_list, file_list in app_file:
-        for dir_name in dir_list:
-            file_path = os.path.join(path, dir_name)
+        if dir_list.__len__() == 0:
+            file_path = os.path.join(path, "")
             for dir_path in os.listdir(file_path):
                 file_full_path = os.path.join(file_path, dir_path)
                 print("the strings file of the project, file_full_path " + str(file_full_path))
-                if file_full_path.endswith(".strings") and (file_full_path.__contains__("zh-CN.lproj")
+                if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
                                                             or file_full_path.__contains__("zh-Hans.lproj")
                                                             or file_full_path.__contains__("zh.lproj")
                                                             or file_full_path.__contains__("zh_CN.lproj")
 
                 ) :
                     string_file_listA.append(file_full_path)
+        else:
+            for dir_name in dir_list:
+                print("iiiiiiiiiiiiiiiiiiiiiiiiii dir_name = " + str(dir_name) + ", path = " + path)
+                file_path = os.path.join(path, dir_name)
+                for dir_path in os.listdir(file_path):
+                    file_full_path = os.path.join(file_path, dir_path)
+                    print("the strings file of the project, file_full_path " + str(file_full_path))
+                    if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
+                                                                or file_full_path.__contains__("zh-Hans.lproj")
+                                                                or file_full_path.__contains__("zh.lproj")
+                                                                or file_full_path.__contains__("zh_CN.lproj")
+
+                    ) :
+                        string_file_listA.append(file_full_path)
     print("the strings file of the project, total " + str(string_file_listA.__len__()))
     return string_file_listA
 
@@ -115,6 +129,38 @@ def get_ios_project_string_dict():
     return ios_module_string_dict
 
 
+def get_ios_project_string_dict_all():
+    """
+    获得的是以 中文字符串 为 key, value 是 ios_string 对象组成的 list的 dict
+    :return:
+    """
+    module_list = get_all_module_name()
+    ios_string_list = []
+    for module_name in module_list:
+        string_file_list = get_all_strings_xml_file(module_name, ios_app_project_path)
+        print("======================= ")
+        for file in string_file_list:
+            print("======================= file = " + str(file))
+
+            ios_string_list.extend(read_strings_from_file(module_name, file))
+
+    ios_string_dict = {}
+    for ios_string in ios_string_list:
+        print("ios string   ios_string = " + str(ios_string))
+        try:
+           ios_string_list = ios_string_dict[ios_string.value]
+        except:
+            ios_string_list = None
+        if ios_string_list is None:
+            ios_string_dict[ios_string.value] = [ios_string]
+        else:
+            ios_string_list.append(ios_string)
+
+    for key in ios_string_dict.keys():
+        print("========= ios key = " + str(key) + " value = " + str(ios_string_dict.get(key)))
+
+    return ios_string_dict
+
 def strip_null_value_string_dict():
     ios_module_string = get_ios_project_string_dict()
     module_string = {}
@@ -129,8 +175,6 @@ def strip_null_value_string_dict():
     return module_string
 
 
-# string_dict = strip_null_value_string_dict()
-# for module_name in string_dict.keys():
-#     list_d = string_dict.get(module_name)
-#     for d in list_d:
-#         print("================= " + str(d))
+if __name__ == '__main__':
+    pass
+    # get_ios_project_string_dict_all()

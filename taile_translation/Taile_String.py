@@ -1,6 +1,6 @@
 class TaileString:
     def __init__(self, module_name: str,
-                 simplified_chinese: str, english_us: str,
+                 simplified_chinese: str, english_us="",
                  page_start="", isStringArray=False, android_src_path="", ios_module="",
                  android_id="", function_desc="",
                  default_lang="", ios_id="",
