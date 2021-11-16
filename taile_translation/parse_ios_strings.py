@@ -7,7 +7,7 @@ from ios_string import IOS_String
 """
 只获取该项目的英文翻译的字段和中文翻译的字段, 然后基于英文和中文去对比和比较
 """
-ios_app_project_path = "/Users/Matthew/Downloads/yongzheng/yongzheng"
+ios_app_project_path = "/Volumes/Matthew/code/firefox/firefox-ios"
 
 
 def get_all_strings_xml_file(module_name, module_string_path):
@@ -29,6 +29,8 @@ def get_all_strings_xml_file(module_name, module_string_path):
             file_path = os.path.join(path, "")
             for dir_path in os.listdir(file_path):
                 file_full_path = os.path.join(file_path, dir_path)
+                if os.path.isdir(file_full_path):
+                    continue
                 print("the strings file of the project, file_full_path " + str(file_full_path))
                 if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
                                                             or file_full_path.__contains__("zh-Hans.lproj")
@@ -39,8 +41,9 @@ def get_all_strings_xml_file(module_name, module_string_path):
                     string_file_listA.append(file_full_path)
         else:
             for dir_name in dir_list:
-                print("iiiiiiiiiiiiiiiiiiiiiiiiii dir_name = " + str(dir_name) + ", path = " + path)
                 file_path = os.path.join(path, dir_name)
+                if os.path.isdir(file_path):
+                    continue
                 for dir_path in os.listdir(file_path):
                     file_full_path = os.path.join(file_path, dir_path)
                     print("the strings file of the project, file_full_path " + str(file_full_path))
