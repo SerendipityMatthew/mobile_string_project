@@ -7,7 +7,7 @@ from ios_string import IOS_String
 """
 只获取该项目的英文翻译的字段和中文翻译的字段, 然后基于英文和中文去对比和比较
 """
-ios_app_project_path = "/mnt/d/code/yongzheng/yongzheng"
+ios_app_project_path = "/Users/Matthew/Downloads/yongzheng/yongzheng"
 
 
 def get_all_strings_xml_file(module_name, module_string_path):
@@ -105,7 +105,7 @@ def read_strings_from_file(module_name: str, file_path):
             if str(string).__contains__("\"=\""): # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
                 ios_string_id = string.split("\"=\"")[0].replace("\"", "")
                 ios_string_value = string.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
-            print("================= ios string value  = " + str(string) + " file_path = " + str(file_path))
+            # print("================= ios string value  = " + str(string) + " file_path = " + str(file_path))
             ios_string = IOS_String(module_name, ios_string_id, ios_string_value, project_file_path)
             ios_string_list.append(ios_string)
     for ios_string in ios_string_list:
@@ -138,12 +138,11 @@ def get_ios_project_string_dict_all()->dict:
     ios_string_list = []
     for module_name in module_list:
         string_file_list = get_all_strings_xml_file(module_name, ios_app_project_path)
-        print("======================= ")
+        string_file_list = list(set(string_file_list))
         for file in string_file_list:
             print("======================= file = " + str(file))
-
             ios_string_list.extend(read_strings_from_file(module_name, file))
-
+    ios_string_list = filter(lambda x: str(x).__contains__("Base.lproj") or str(x).__contains__("en.lproj") , ios_string_list)
     ios_string_dict = {}
     for ios_string in ios_string_list:
         print("ios string   ios_string = " + str(ios_string))
@@ -156,9 +155,6 @@ def get_ios_project_string_dict_all()->dict:
             ios_string_dict[strip_value] = [ios_string]
         else:
             ios_string_list.append(ios_string)
-
-    for key in ios_string_dict.keys():
-        print("========= ios key = " + str(key) + " value = " + str(ios_string_dict.get(key)))
 
     return ios_string_dict
 
@@ -177,5 +173,4 @@ def strip_null_value_string_dict():
 
 
 if __name__ == '__main__':
-    pass
-    # get_ios_project_string_dict_all()
+    get_ios_project_string_dict_all()
