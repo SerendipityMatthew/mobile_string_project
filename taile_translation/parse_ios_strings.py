@@ -31,7 +31,6 @@ def get_all_strings_xml_file(module_name, module_string_path):
                 file_full_path = os.path.join(file_path, dir_path)
                 if os.path.isdir(file_full_path):
                     continue
-                print("the strings file of the project, file_full_path " + str(file_full_path))
                 if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
                                                             or file_full_path.__contains__("zh-Hans.lproj")
                                                             or file_full_path.__contains__("zh.lproj")
@@ -46,7 +45,6 @@ def get_all_strings_xml_file(module_name, module_string_path):
                     continue
                 for dir_path in os.listdir(file_path):
                     file_full_path = os.path.join(file_path, dir_path)
-                    print("the strings file of the project, file_full_path " + str(file_full_path))
                     if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
                                                                 or file_full_path.__contains__("zh-Hans.lproj")
                                                                 or file_full_path.__contains__("zh.lproj")
@@ -111,9 +109,6 @@ def read_strings_from_file(module_name: str, file_path):
             # print("================= ios string value  = " + str(string) + " file_path = " + str(file_path))
             ios_string = IOS_String(module_name, ios_string_id, ios_string_value, project_file_path)
             ios_string_list.append(ios_string)
-    for ios_string in ios_string_list:
-        pass
-        # print("ios_string = " + str(ios_string))
     return ios_string_list
 
 
@@ -122,7 +117,6 @@ def get_ios_project_string_dict():
     ios_module_string_dict = {}
     for module in module_list:
         string_file_list = get_all_strings_xml_file(module, ios_app_project_path)
-        # print("string_file_list = " + str(string_file_list.__len__()))
         module_string_list = []
         for file in string_file_list:
             list_c = read_strings_from_file(module, file)
@@ -143,7 +137,6 @@ def get_ios_project_string_dict_all()->dict:
         string_file_list = get_all_strings_xml_file(module_name, ios_app_project_path)
         string_file_list = list(set(string_file_list))
         for file in string_file_list:
-            print("======================= file = " + str(file))
             ios_string_list.extend(read_strings_from_file(module_name, file))
     ios_string_list = filter(lambda x: str(x).__contains__("Base.lproj") or str(x).__contains__("en.lproj") , ios_string_list)
     ios_string_dict = {}
@@ -160,6 +153,7 @@ def get_ios_project_string_dict_all()->dict:
             ios_string_list.append(ios_string)
 
     return ios_string_dict
+
 
 def strip_null_value_string_dict():
     ios_module_string = get_ios_project_string_dict()
