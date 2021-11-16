@@ -129,7 +129,7 @@ def get_ios_project_string_dict():
     return ios_module_string_dict
 
 
-def get_ios_project_string_dict_all():
+def get_ios_project_string_dict_all()->dict:
     """
     获得的是以 中文字符串 为 key, value 是 ios_string 对象组成的 list的 dict
     :return:
@@ -147,12 +147,13 @@ def get_ios_project_string_dict_all():
     ios_string_dict = {}
     for ios_string in ios_string_list:
         print("ios string   ios_string = " + str(ios_string))
+        strip_value = str(ios_string.value).strip().strip("\n")
         try:
-           ios_string_list = ios_string_dict[ios_string.value]
+           ios_string_list = ios_string_dict[strip_value]
         except:
             ios_string_list = None
         if ios_string_list is None:
-            ios_string_dict[ios_string.value] = [ios_string]
+            ios_string_dict[strip_value] = [ios_string]
         else:
             ios_string_list.append(ios_string)
 

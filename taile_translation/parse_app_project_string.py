@@ -370,7 +370,7 @@ def write_excel_xls(path, sheet_name, value):
     print("xls格式表格写入数据成功！")
 
 
-def read_all_strings_from_android_xml():
+def read_all_strings_from_android_xml() -> list:
     all_string_list = get_all_strings_xml_file()
     all_string = []
     for module_name in module_name_list:
@@ -714,7 +714,7 @@ def write_code_string_excel_xls(path: str, sorted_string_map: dict):
     print("xls格式表格写入数据成功！")
 
 
-def parse_string():
+def parse_string() -> list:
     """
     大致的流程描述
     1. 按照模块 读取 android 源代码里的 String
@@ -735,7 +735,7 @@ def is_contains_chinese(strs):
     return False
 
 
-def merge_same_string():
+def merge_same_string() -> dict:
     """
     android 相同的中文相同字符串合并
     :return:
@@ -761,12 +761,13 @@ def merge_same_string():
             #     taile_string)
             taile_string_dict[taile_string.default_lang].append(
                 taile_string)
-    for key in taile_string_dict.keys():
-        print("========= key = " + str(key) + " value = " + str(taile_string_dict.get(key)))
+    # for key in taile_string_dict.keys():
+    #     print("========= key = " + str(key) + " value = " + str(taile_string_dict.get(key)))
+    return taile_string_dict
 
 
-def get_all_ios_string():
-    get_ios_project_string_dict_all()
+def get_all_ios_string() -> dict:
+    return get_ios_project_string_dict_all()
 
 
 def hello():
@@ -822,6 +823,65 @@ def hello():
     write_code_string_excel_xls("code_string_translation.xls", sorted_string_map)
 
 
+def remove_duplicate(list1) -> list:
+    return list(set(list1))
+
+
+def merge_android_and_ios_string() -> dict:
+    """
+     将 android 的 字符串和额 ios 的字符串 根据 中文字符串合并到同一个 dict 里面去
+    :return:
+    """
+    all_ios_string_dict = get_all_ios_string()
+    all_android_string_dict = merge_same_string()
+    #  android ios 存放的字符串的 字典, 在这里合并
+    megered_string_dict = {}
+
+    # 遍历所有的 ios_string_dict
+    for ios_string_key in all_ios_string_dict.keys():
+        # 遍历所有的 android_string_dict
+        for android_string_key in all_android_string_dict.keys():
+            try:
+                mergered_string_list = megered_string_dict[android_string_key]
+            except:
+                mergered_string_list = None
+            # android_string_list = all_android_string_dict.get(android_string_key)
+
+            # ios 和 Android 的中文字符串是一样的
+            if str(android_string_key).strip() == str(ios_string_key).strip():
+                #  如果之前没有元素存放进去, 那么就默认的给一个 空的 list
+                if mergered_string_list is None:
+                    megered_string_dict[android_string_key] = []
+                megered_string_dict[android_string_key].extend(all_ios_string_dict.get(ios_string_key))
+                megered_string_dict[android_string_key].extend(all_android_string_dict.get(android_string_key))
+
+                #  去掉 list 中的重复的
+
+                megered_string_dict[android_string_key] = remove_duplicate(megered_string_dict[android_string_key])
+
+            else:
+
+                if mergered_string_list is None:
+                    megered_string_dict[android_string_key] = []
+                megered_string_dict[android_string_key].extend(all_android_string_dict.get(android_string_key))
+
+                if megered_string_dict.get(ios_string_key) is None:
+                    megered_string_dict[ios_string_key] = []
+                megered_string_dict[ios_string_key].extend(all_ios_string_dict.get(ios_string_key))
+
+                if megered_string_dict.get(ios_string_key) is None:
+                    megered_string_dict[ios_string_key] = []
+                megered_string_dict[ios_string_key].extend(all_ios_string_dict.get(ios_string_key))
+                #  去掉 list 中的重复的
+                megered_string_dict[android_string_key] = remove_duplicate(megered_string_dict[android_string_key])
+                megered_string_dict[ios_string_key] = remove_duplicate(megered_string_dict[ios_string_key])
+    for megered_string_key in megered_string_dict.keys():
+        megered_string_dict[megered_string_key].extend(remove_duplicate(megered_string_dict.get(megered_string_key)))
+    return megered_string_dict
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    get_all_ios_string()
+    all_string_dict = merge_android_and_ios_string()
+    for key in all_string_dict.keys():
+        print("========= all_string_dict key = " + str(key) + " value = " + str(remove_duplicate(all_string_dict.get(key))))
