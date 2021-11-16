@@ -11,6 +11,7 @@ from xlrd.sheet import Sheet
 import platform
 
 from Taile_String import TaileString
+from ios_string import IOS_String
 from parse_ios_strings import get_ios_project_string_dict, get_ios_project_string_dict_all
 from parse_module import get_app_project_module, project_path
 
@@ -880,8 +881,48 @@ def merge_android_and_ios_string() -> dict:
     return megered_string_dict
 
 
+def generate_string_excel(string_dict):
+    path = "android_ios_megered_string.xls"
+    length = string_dict.__len__()  # 获取需要写入数据的行数
+    workbook = xlwt.Workbook()  # 新建一个工作簿
+    print("========== length " + str(length))
+    sheet = workbook.add_sheet("code_string", cell_overwrite_ok=True)  # 在工作簿中新建一个表格
+    cell_style = module_name_cell_style()
+    # 写文件的头
+    sheet.write(0, 0, "中文字符串")
+    sheet.write(0, 1, "韩语字符串")  # 韩语字符串
+    sheet.write(0, 2, "android 模块和资源id")
+    sheet.write(0, 3, "ios 模块和资源id")  # 韩语字符串
+    # 遍历 所有的 字符串资源
+    index = 1
+    for string_key in string_dict.keys():
+        single_module_name_list = string_dict[string_key]
+        print("key  = " + string_key + ", the length: " + str(single_module_name_list.__len__()))
+        # 写入一个模块的资源
+        single_module_name_list = string_dict[string_key]
+        # 写入一个模块的资源
+        # Column1    Column2             (Column3)                    (Column14)
+        # 中文字符串   韩语字符串      (android module-android id)      (ios module - ios id)
+        sheet.write(index, 0, string_key)
+        sheet.write(index, 1, "")  # 韩语字符串
+        android_module_res_id = ""
+        ios_module_res_id = ""
+        for string in single_module_name_list:
+            if type(string) is TaileString:
+                android_module_res_id = android_module_res_id + "&" + string.module_name + "#" + string.android_id
+            if type(string) is IOS_String:
+                ios_module_res_id = ios_module_res_id + "&" + string.module_name + "#" + string.string_id
+        sheet.write(index, 2, android_module_res_id)
+        sheet.write(index, 3, ios_module_res_id)  # 韩语字符串
+        index += 1
+
+    workbook.save(path)  # 保存工作簿
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     all_string_dict = merge_android_and_ios_string()
     for key in all_string_dict.keys():
-        print("========= all_string_dict key = " + str(key) + " value = " + str(remove_duplicate(all_string_dict.get(key))))
+        print("========= all_string_dict key = " + str(key) + " value = " + str(
+            remove_duplicate(all_string_dict.get(key))))
+    generate_string_excel(all_string_dict)
