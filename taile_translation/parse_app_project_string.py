@@ -736,7 +736,7 @@ def is_contains_chinese(strs):
     return False
 
 
-def merge_same_string() -> dict:
+def android_all_string() -> dict:
     """
     android 相同的中文相同字符串合并
     :return:
@@ -745,8 +745,6 @@ def merge_same_string() -> dict:
     taile_string_dict = {}
     for taile_string in android_strings_list:
         print("=========== " + str(taile_string))
-        if is_contains_chinese(taile_string.default_lang) is False:
-            continue
 
         try:
             same_key_value = taile_string_dict[taile_string.default_lang]
@@ -834,7 +832,7 @@ def merge_android_and_ios_string() -> dict:
     :return:
     """
     all_ios_string_dict = get_all_ios_string()
-    all_android_string_dict = merge_same_string()
+    all_android_string_dict = android_all_string()
     #  android ios 存放的字符串的 字典, 在这里合并
     megered_string_dict = {}
 
@@ -921,8 +919,9 @@ def generate_string_excel(string_dict):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    all_string_dict = merge_android_and_ios_string()
-    for key in all_string_dict.keys():
-        print("========= all_string_dict key = " + str(key) + " value = " + str(
-            remove_duplicate(all_string_dict.get(key))))
-    generate_string_excel(all_string_dict)
+    android_all_string()
+    # all_string_dict = merge_android_and_ios_string()
+    # for key in all_string_dict.keys():
+    #     print("========= all_string_dict key = " + str(key) + " value = " + str(
+    #         remove_duplicate(all_string_dict.get(key))))
+    # generate_string_excel(all_string_dict)

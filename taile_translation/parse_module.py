@@ -1,6 +1,6 @@
 import os
 
-project_path = "/mnt/d/code/mxapp_smartplus_android" + os.sep
+project_path = "/Volumes/Matthew/code/firefox/fenix" + os.sep
 project_name = project_path.split(os.sep)[-2]
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 
