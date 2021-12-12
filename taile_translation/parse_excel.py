@@ -148,7 +148,12 @@ def generate_ios_res(string_dict: dict, filePath: str, file_name: str):
         os.makedirs(filePath)
     with open(filePath + file_name, mode="w+") as f:
         for ios_string_key in string_dict.keys():
-            string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + string_dict[ios_string_key] + "\";\n"
+            if ios_string_key == "":
+                continue
+            ios_string = string_dict[ios_string_key]
+            if ios_string == "":
+                continue
+            string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + ios_string + "\";\n"
             f.write(string_line)
 
 
@@ -157,7 +162,8 @@ def generate_module_string_to_ios_file(module_name, module_string_list, xml_file
     string_dict = {}
     for page_start_string in module_string_list:
         print("============ page_start_string  = ", page_start_string)
-        string_dict[page_start_string.string_id] = page_start_string.value
+        if page_start_string.module_name == module_name:
+            string_dict[page_start_string.string_id] = page_start_string.value
     print(" simplified_chinese_dict = " + str(len(string_dict)))
     if len(string_dict) != 0:
         trimmed_string_dict = {}
