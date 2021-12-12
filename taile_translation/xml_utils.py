@@ -64,7 +64,7 @@ def is_number(s):
     return False
 
 
-def generate_string_res(string_value_dict: dict, file_path: str, file_name: str):
+def generate_android_res(string_value_dict: dict, file_path: str, file_name: str):
     """
     将 android 的字符串 写成 android的 strings.xml 的格式
     """
@@ -99,6 +99,6 @@ def test_xml_generator():
     用来测试 generate_string_res 和 pretty_xml_to_file 方法是否正确执行的
     """
     name_key_value = {"Matthew": "Mona", "Mona": "1111"}
-    generate_string_res(name_key_value, "pretty_xml_to_file_test.xml", "pretty_xml_to_file_test.xml")
+    generate_android_res(name_key_value, "pretty_xml_to_file_test.xml", "pretty_xml_to_file_test.xml")
 
 # test_xml_generator()
