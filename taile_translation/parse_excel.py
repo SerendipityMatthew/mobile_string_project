@@ -192,8 +192,9 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
 
     string_dict = {}
     for page_start_string in module_string_list:
-        print("============ page_start_string  = ", page_start_string)
-        string_dict[page_start_string.android_id] = page_start_string.simplified_chinese
+        if page_start_string.module_name == module_name:
+            print("============ page_start_string  = ", page_start_string)
+            string_dict[page_start_string.android_id] = page_start_string.simplified_chinese
     print(" simplified_chinese_dict = " + str(len(string_dict)))
     if len(string_dict) != 0:
         trimmed_string_dict = {}
@@ -209,7 +210,8 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
     string_dict.clear()
 
     for page_start_string in module_string_list:
-        string_dict[page_start_string.android_id] = page_start_string.english_us
+        if page_start_string.module_name == module_name:
+            string_dict[page_start_string.android_id] = page_start_string.english_us
     if len(string_dict) != 0:
         trimmed_string_dict = {}
         for stringA in string_dict.keys():
@@ -324,15 +326,15 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
 if __name__ == "__main__":
     all_string_list = parse_excel_file()
 
-    # android_string_list = get_android_string(all_string_list)
-    # android_module_name_list = []
-    # for android_string in android_string_list:
-    #     android_module_name_list.append(android_string.module_name)
-    #
-    # print("=============== android_string_list.size = ", len(android_string_list))
-    # module_list = list(set(android_module_name_list))
-    # for module_name_A in module_list:
-    #     generate_module_string_to_xml(module_name_A, android_string_list, )
+    android_string_list = get_android_string(all_string_list)
+    android_module_name_list = []
+    for android_string in android_string_list:
+        android_module_name_list.append(android_string.module_name)
+
+    print("=============== android_string_list.size = ", len(android_string_list))
+    module_list = list(set(android_module_name_list))
+    for module_name_A in module_list:
+        generate_module_string_to_xml(module_name_A, android_string_list, )
     ios_string_list = get_ios_string(all_string_list)
     ios_module_name_list = []
     for ios_string in ios_string_list:
