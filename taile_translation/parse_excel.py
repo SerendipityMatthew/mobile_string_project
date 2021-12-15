@@ -6,7 +6,7 @@ from Taile_String import TaileString
 from xml_utils import generate_android_res
 from ios_string import IOS_String
 
-string_excel_file = "SmartPlus_MultiLanguageDictionary.xlsx"
+string_excel_file = "SmartPlus_MultiLanguageDictionary_20211202.xlsx"
 
 
 def parse_excel_file():
@@ -93,7 +93,7 @@ def parse_excel_file():
                 print("-------------  hello = ", module_res_id_item)
                 module_name = module_res_id_item.split("#")[0]
                 ios_id = module_res_id_item.split("#")[1]
-                ios_string = IOS_String(value=english_us, string_id=ios_id, module_name=module_name, file_name="")
+                ios_string = IOS_String(value=english_us, string_id=ios_id, module_name=module_name, file_name="", chinese_simple_str=chinese_simple_str)
                 list.append(ios_string)
     return list
 
@@ -102,8 +102,6 @@ def parse_excel_file():
 根据模块的名称动态的生成变量名称:
 形如 page_start_string_list
 """
-
-import parse_module
 
 
 def get_module_string(module_name: str, string_list: list):
@@ -164,7 +162,7 @@ def generate_module_string_to_ios_file(module_name, module_string_list, xml_file
         print("============ page_start_string  = ", page_start_string)
         if page_start_string.module_name == module_name:
             string_dict[page_start_string.string_id] = page_start_string.value
-    print(" simplified_chinese_dict = " + str(len(string_dict)))
+    print(" english str = " + str(len(string_dict)))
     if len(string_dict) != 0:
         trimmed_string_dict = {}
         for stringA in string_dict.keys():
@@ -175,6 +173,26 @@ def generate_module_string_to_ios_file(module_name, module_string_list, xml_file
         if len(trimmed_string_dict) != 0:
             generate_ios_res(string_dict,
                              module_name_path + "/" + "en.proj" + "/",
+                             file_name=xml_file_name)
+
+    string_dict.clear()
+
+    #  获取简体中文的字符串
+    for page_start_string in module_string_list:
+        print("============ page_start_string  = ", page_start_string)
+        if page_start_string.module_name == module_name:
+            string_dict[page_start_string.string_id] = page_start_string.chinese_simple_str
+    print(" simplified_chinese_dict = " + str(len(string_dict)))
+    if len(string_dict) != 0:
+        trimmed_string_dict = {}
+        for stringA in string_dict.keys():
+            value = string_dict[stringA]
+            if value != "":
+                trimmed_string_dict[stringA] = value
+            print("--------------- string_dict[stringA] ", )
+        if len(trimmed_string_dict) != 0:
+            generate_ios_res(string_dict,
+                             module_name_path + "/" + "zh.proj" + "/",
                              file_name=xml_file_name)
 
     string_dict.clear()
