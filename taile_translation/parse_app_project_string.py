@@ -14,6 +14,7 @@ from Taile_String import TaileString
 from ios_string import IOS_String
 from parse_ios_strings import get_ios_project_string_dict, get_ios_project_string_dict_all
 from parse_module import get_app_project_module, project_path
+from read_ini_utils import get_android_strings_files
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
@@ -124,9 +125,17 @@ def parse_module_string(module_name: str, all_string_list):
 
         if string_file.__contains__(module_name_str):
             page_start_string_list.append(string_file)
-
+    wanted_string_list = []
+    """
+    过滤出配置文件里的所需要的 字符串文件
+    """
     for xml_file in page_start_string_list:
+        string_files = get_android_strings_files()
+        for wanted_file in string_files:
+            if xml_file.endswith(wanted_file):
+                wanted_string_list.append(xml_file)
 
+    for xml_file in wanted_string_list:
         if xml_file.endswith("dimen.xml"):
             continue
         if xml_file.endswith("color.xml"):
@@ -919,9 +928,8 @@ def generate_string_excel(string_dict):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    android_all_string()
-    # all_string_dict = merge_android_and_ios_string()
+    all_string_dict = android_all_string()
     # for key in all_string_dict.keys():
     #     print("========= all_string_dict key = " + str(key) + " value = " + str(
     #         remove_duplicate(all_string_dict.get(key))))
-    # generate_string_excel(all_string_dict)
+    generate_string_excel(all_string_dict)
