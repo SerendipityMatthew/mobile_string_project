@@ -146,8 +146,11 @@ def get_ios_project_string_dict_all() -> dict:
                              ios_string_list)
     ios_string_dict = {}
     for ios_string in ios_string_list:
-        print("ios string   ios_string = " + str(ios_string))
         strip_value = str(ios_string.value).strip().strip("\n")
+
+        # if not str(ios_string.string_id).startswith("SYM_"):
+        #     continue
+        # print("ios string   ios_string = " + str(ios_string.string_id))
         try:
             ios_string_list = ios_string_dict[strip_value]
         except:
@@ -156,6 +159,8 @@ def get_ios_project_string_dict_all() -> dict:
             ios_string_dict[strip_value] = [ios_string]
         else:
             ios_string_list.append(ios_string)
+            ios_string_dict[strip_value] = ios_string_list
+
 
     return ios_string_dict
 
