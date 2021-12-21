@@ -1,6 +1,8 @@
 import os
 
-project_path = "/Volumes/Matthew/code/firefox/fenix" + os.sep
+from read_ini_utils import get_android_project_path
+
+project_path = get_android_project_path() + os.sep
 project_name = project_path.split(os.sep)[-2]
 mxapp_smartplus_android_common = project_name + os.sep + "src"
 

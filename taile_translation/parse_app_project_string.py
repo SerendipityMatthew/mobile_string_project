@@ -14,7 +14,7 @@ from Taile_String import TaileString
 from ios_string import IOS_String
 from parse_ios_strings import get_ios_project_string_dict, get_ios_project_string_dict_all
 from parse_module import get_app_project_module, project_path
-from read_ini_utils import get_android_strings_files
+from read_ini_utils import get_android_strings_files, get_targe_language, get_generate_excel_file_name
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
@@ -889,7 +889,7 @@ def merge_android_and_ios_string() -> dict:
 
 
 def generate_string_excel(string_dict):
-    path = "android_ios_megered_string.xls"
+    path = get_generate_excel_file_name()
     length = string_dict.__len__()  # 获取需要写入数据的行数
     workbook = xlwt.Workbook()  # 新建一个工作簿
     print("========== length " + str(length))
@@ -897,7 +897,7 @@ def generate_string_excel(string_dict):
     cell_style = module_name_cell_style()
     # 写文件的头
     sheet.write(0, 0, "中文字符串")
-    sheet.write(0, 1, "韩语字符串")  # 韩语字符串
+    sheet.write(0, 1, get_targe_language())  # 韩语字符串
     sheet.write(0, 2, "android 模块和资源id")
     sheet.write(0, 3, "ios 模块和资源id")  # 韩语字符串
     # 遍历 所有的 字符串资源
@@ -928,8 +928,8 @@ def generate_string_excel(string_dict):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    all_string_dict = android_all_string()
-    # for key in all_string_dict.keys():
-    #     print("========= all_string_dict key = " + str(key) + " value = " + str(
-    #         remove_duplicate(all_string_dict.get(key))))
+    all_string_dict = merge_android_and_ios_string()
+    for key in all_string_dict.keys():
+        print("========= all_string_dict key = " + str(key) + " value = " + str(
+            remove_duplicate(all_string_dict.get(key))))
     generate_string_excel(all_string_dict)

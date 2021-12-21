@@ -3,11 +3,12 @@ import os
 import chardet
 
 from ios_string import IOS_String
+from read_ini_utils import get_ios_strings_files, get_ios_project_path
 
 """
 只获取该项目的英文翻译的字段和中文翻译的字段, 然后基于英文和中文去对比和比较
 """
-ios_app_project_path = "/Volumes/Matthew/code/firefox/firefox-ios"
+ios_app_project_path = get_ios_project_path()
 
 
 def get_all_strings_xml_file(module_name, module_string_path):
@@ -32,11 +33,11 @@ def get_all_strings_xml_file(module_name, module_string_path):
                 if os.path.isdir(file_full_path):
                     continue
                 if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
-                                                            or file_full_path.__contains__("zh-Hans.lproj")
-                                                            or file_full_path.__contains__("zh.lproj")
-                                                            or file_full_path.__contains__("zh_CN.lproj")
+                                                           or file_full_path.__contains__("zh-Hans.lproj")
+                                                           or file_full_path.__contains__("zh.lproj")
+                                                           or file_full_path.__contains__("zh_CN.lproj")
 
-                ) :
+                ):
                     string_file_listA.append(file_full_path)
         else:
             for dir_name in dir_list:
@@ -46,11 +47,11 @@ def get_all_strings_xml_file(module_name, module_string_path):
                 for dir_path in os.listdir(file_path):
                     file_full_path = os.path.join(file_path, dir_path)
                     if file_full_path.endswith(".strings") or (file_full_path.__contains__("zh-CN.lproj")
-                                                                or file_full_path.__contains__("zh-Hans.lproj")
-                                                                or file_full_path.__contains__("zh.lproj")
-                                                                or file_full_path.__contains__("zh_CN.lproj")
+                                                               or file_full_path.__contains__("zh-Hans.lproj")
+                                                               or file_full_path.__contains__("zh.lproj")
+                                                               or file_full_path.__contains__("zh_CN.lproj")
 
-                    ) :
+                    ):
                         string_file_listA.append(file_full_path)
     print("the strings file of the project, total " + str(string_file_listA.__len__()))
     return string_file_listA
@@ -100,10 +101,10 @@ def read_strings_from_file(module_name: str, file_path):
                 continue
             ios_string_id = ""
             ios_string_value = ""
-            if str(string).__contains__("\" = \""): # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的
+            if str(string).__contains__("\" = \""):  # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的
                 ios_string_id = string.split("\" ")[0].replace("\"", "")
                 ios_string_value = string.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
-            if str(string).__contains__("\"=\""): # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
+            if str(string).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
                 ios_string_id = string.split("\"=\"")[0].replace("\"", "")
                 ios_string_value = string.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
             # print("================= ios string value  = " + str(string) + " file_path = " + str(file_path))
@@ -126,7 +127,7 @@ def get_ios_project_string_dict():
     return ios_module_string_dict
 
 
-def get_ios_project_string_dict_all()->dict:
+def get_ios_project_string_dict_all() -> dict:
     """
     获得的是以 中文字符串 为 key, value 是 ios_string 对象组成的 list的 dict
     :return:
@@ -137,14 +138,18 @@ def get_ios_project_string_dict_all()->dict:
         string_file_list = get_all_strings_xml_file(module_name, ios_app_project_path)
         string_file_list = list(set(string_file_list))
         for file in string_file_list:
-            ios_string_list.extend(read_strings_from_file(module_name, file))
-    ios_string_list = filter(lambda x: str(x).__contains__("Base.lproj") or str(x).__contains__("en.lproj") , ios_string_list)
+            for wanted_ios_file in get_ios_strings_files():
+                if file.endswith(wanted_ios_file):
+                    ios_string_list.extend(read_strings_from_file(module_name, file))
+
+    ios_string_list = filter(lambda x: str(x).__contains__("Base.lproj") or str(x).__contains__("zh.lproj"),
+                             ios_string_list)
     ios_string_dict = {}
     for ios_string in ios_string_list:
         print("ios string   ios_string = " + str(ios_string))
         strip_value = str(ios_string.value).strip().strip("\n")
         try:
-           ios_string_list = ios_string_dict[strip_value]
+            ios_string_list = ios_string_dict[strip_value]
         except:
             ios_string_list = None
         if ios_string_list is None:
