@@ -137,8 +137,12 @@ def get_ios_project_string_dict_all() -> dict:
     for module_name in module_list:
         string_file_list = get_all_strings_xml_file(module_name, ios_app_project_path)
         string_file_list = list(set(string_file_list))
+
         for file in string_file_list:
-            for wanted_ios_file in get_ios_strings_files():
+            file_list = get_ios_strings_files()
+            if len(file_list) == 0:
+                break
+            for wanted_ios_file in file_list:
                 if file.endswith(wanted_ios_file):
                     ios_string_list.extend(read_strings_from_file(module_name, file))
 

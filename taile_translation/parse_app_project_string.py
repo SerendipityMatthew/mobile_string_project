@@ -131,6 +131,8 @@ def parse_module_string(module_name: str, all_string_list):
     """
     for xml_file in page_start_string_list:
         string_files = get_android_strings_files()
+        if len(string_files) == 0:
+            break
         for wanted_file in string_files:
             if xml_file.endswith(wanted_file):
                 wanted_string_list.append(xml_file)
