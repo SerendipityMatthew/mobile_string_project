@@ -5,7 +5,7 @@ target_language = "JA"
 translator = deepl.Translator(auth_key)
 
 
-def get_translation_text(target_lang: str, text: str):
+def get_translation_text(text: str, target_lang: str):
     result = translator.translate_text(text, target_lang=target_lang)
     translated_text = result.text
     print("the translated text is: ", translated_text)
