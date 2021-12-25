@@ -116,7 +116,8 @@ def read_strings_from_file(module_name: str, file_path):
             string_name_value = child.text
             if string_name_value is None:
                 string_name_value = ""
-            if relative_file_path.__contains__("values-zh-rCN"):
+            if relative_file_path.__contains__("values-zh-rCN")\
+                    or relative_file_path.__contains__("values/strings"):
                 android_string = MobileString(module_name, string_id=string_name_id,
                                               zh_cn=string_name_value, is_android_string=True,
                                               zh_cn_file=relative_file_path)
@@ -164,7 +165,7 @@ def read_strings_from_file(module_name: str, file_path):
                                               english_us_file=relative_file_path)
                 android_string_list.append(android_string)
 
-            if relative_file_path.__contains__("values-ru-rRu"):
+            if relative_file_path.__contains__("values-ru-rRU"):
                 android_string = MobileString(module_name, string_id=string_name_id,
                                               russia=string_name_value, is_android_string=True,
                                               russia_file=relative_file_path)
