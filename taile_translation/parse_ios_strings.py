@@ -260,7 +260,8 @@ def get_ios_string_dict_by_module() -> dict:
         if module_string_list_A is None:
             module_string_list_A = []
         module_string_dict[module] = module_string_list_A.append(string_dict_by_id[ios_string_id])
-        print("ios_string_id  ======= ", string_dict_by_id[ios_string_id])
+    print("the all module string ", len(module_string_dict))
+
     return module_string_dict
 
 

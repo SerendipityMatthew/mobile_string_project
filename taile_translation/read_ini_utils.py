@@ -5,12 +5,21 @@ config.read('config.ini')
 print(config.get('project', 'android_strings_files'))
 
 
+def get_common_string_files(properties: str):
+    file_list = config.get('project', properties).split(",")
+    wanted_file_list = []
+    for file in file_list:
+        if file is not None and file.strip("\n") != "":
+            wanted_file_list.append(file)
+    return wanted_file_list
+
+
 def get_android_strings_files() -> list:
-    return config.get('project', 'android_strings_files').split(",")
+    return get_common_string_files("android_strings_files")
 
 
 def get_ios_strings_files() -> list:
-    return config.get('project', 'ios_strings_files').split(",")
+    return get_common_string_files("ios_strings_files")
 
 
 def get_ios_project_path() -> str:
@@ -27,3 +36,8 @@ def get_target_language() -> str:
 
 def get_generate_excel_file_name() -> str:
     return config.get('project', 'generate_excel_file_name').strip("\n")
+
+
+if __name__ == "__main__":
+    print("get_android_strings_files() ", get_android_strings_files())
+    print("get_ios_strings_files() ", get_ios_strings_files())
