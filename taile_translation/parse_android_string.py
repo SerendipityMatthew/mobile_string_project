@@ -3,6 +3,7 @@ import os
 import chardet
 
 from deepl_trans_api import get_translation_text
+from google_trans_api import translate
 from mobile_string import MobileString
 from parse_excel import generate_module_string_to_xml
 from parse_module import get_app_project_module
@@ -304,6 +305,8 @@ def generate_android_res(string_value_dict: dict, target_langage: str, file_path
             string_value_str = str(string_value.english_us)
         if target_langage == "ZH-CN":
             string_value_str = str(string_value.zh_cn)
+        if target_langage == "KO":
+            string_value_str = str(string_value.korean)
         if string_value_str == "":
             continue
 
@@ -411,7 +414,9 @@ if __name__ == '__main__':
             if target_lang == "JA":
                 android_string.japan = translated_string(android_string.zh_cn, lang=target_lang)
                 android_string.japan_file = trimmed_module + "/src/main/res/values-ja-rJP/strings.xml"
-
+            if target_lang == "KO":
+                android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
+                android_string.korean_file = trimmed_module + "/src/main/res/values-ko-rKR/strings.xml"
             print("android_string  === ", android_string)
         android_string_dict[string_id] = android_string
     # generate_android_res(android_string_dict)
@@ -432,3 +437,5 @@ if __name__ == '__main__':
             generate_android_res(string_list_dict, "EN-US", file_key)
         if str(file_key).__contains__("values-ja-rJP"):
             generate_android_res(string_list_dict, "JA", file_key)
+        if str(file_key).__contains__("values-ko-rKR"):
+            generate_android_res(string_list_dict, "KO", file_key)
