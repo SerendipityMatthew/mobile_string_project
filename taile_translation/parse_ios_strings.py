@@ -114,8 +114,8 @@ def read_strings_from_file(module_name: str, file_path):
             if str(string).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
                 ios_string_id = string.split("\"=\"")[0].replace("\"", "")
                 ios_string_value = string.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
-            print("module_name = ", module_name, ", ios_string_id = ", ios_string_id, ", ios_string_value = ",
-                  ios_string_value)
+            # print("module_name = ", module_name, ", ios_string_id = ", ios_string_id, ", ios_string_value = ",
+            #       ios_string_value)
             ios_string_value = ios_string_value.strip("\n")
             if relative_file_path.__contains__("zh.lproj") or relative_file_path.__contains__("zh-Hans.lproj"):
                 ios_string = MobileString(module_name, string_id=ios_string_id,
@@ -223,8 +223,12 @@ def merge_mobile_string_object(cache_string: MobileString, append_string: Mobile
 def get_ios_string_dict_by_string_id() -> dict:
     module_list = get_all_module_name()
     ios_module_string_dict = {}
+    print("the all ios module size is ", len(module_list))
+
     for module in module_list:
         string_file_list = get_filtered_strings_file(module, ios_app_project_path)
+        if len(string_file_list) == 0:
+            continue
         module_string_list = []
         for file in string_file_list:
             list_c = read_strings_from_file(module, file)
@@ -248,29 +252,7 @@ def get_ios_string_dict_by_string_id() -> dict:
 
 
 def get_ios_string_dict_by_module() -> dict:
-    module_list = get_all_module_name()
-    ios_module_string_dict = {}
-    for module in module_list:
-        string_file_list = get_filtered_strings_file(module, ios_app_project_path)
-        module_string_list = []
-        for file in string_file_list:
-            list_c = read_strings_from_file(module, file)
-            for c in list_c:
-                module_string_list.append(c)
-
-        print("the module_string_list size is, ", len(module_string_list))
-        ios_module_string_dict[module] = module_string_list
-    print("the all ios module string dict is ", len(ios_module_string_dict))
-    string_dict_by_id = {}
-    for module in ios_module_string_dict.keys():
-        for string in ios_module_string_dict[module]:
-            cache_string = string_dict_by_id.get(string.string_id)
-            if cache_string is None:
-                string_dict_by_id[string.string_id] = string
-            else:
-                merge_cache_string = merge_mobile_string_object(cache_string, string)
-                string_dict_by_id[string.string_id] = merge_cache_string
-
+    string_dict_by_id = get_ios_string_dict_by_string_id()
     module_string_dict = {}
     for ios_string_id in string_dict_by_id.keys():
         module = string_dict_by_id[ios_string_id].module_name
@@ -282,60 +264,6 @@ def get_ios_string_dict_by_module() -> dict:
     return module_string_dict
 
 
-def get_ios_project_string_dict_all() -> dict:
-    """
-    获得的是以 中文字符串 为 key, value 是 ios_string 对象组成的 list的 dict
-    :return:
-    """
-    module_list = get_all_module_name()
-    ios_string_list = []
-    for module_name in module_list:
-        string_file_list = get_all_strings_file(module_name, ios_app_project_path)
-        string_file_list = list(set(string_file_list))
-
-        for file in string_file_list:
-            file_list = get_ios_strings_files()
-            if len(file_list) == 0:
-                break
-            for wanted_ios_file in file_list:
-                if file.endswith(wanted_ios_file):
-                    ios_string_list.extend(read_strings_from_file(module_name, file))
-
-    ios_string_list = filter(lambda x: str(x).__contains__("Base.lproj") or str(x).__contains__("zh.lproj"),
-                             ios_string_list)
-    ios_string_dict = {}
-    for ios_string in ios_string_list:
-        strip_value = str(ios_string.value).strip().strip("\n")
-
-        # if not str(ios_string.string_id).startswith("SYM_"):
-        #     continue
-        # print("ios string   ios_string = " + str(ios_string.string_id))
-        try:
-            ios_string_list = ios_string_dict[strip_value]
-        except:
-            ios_string_list = None
-        if ios_string_list is None:
-            ios_string_dict[strip_value] = [ios_string]
-        else:
-            ios_string_list.append(ios_string)
-            ios_string_dict[strip_value] = ios_string_list
-
-    return ios_string_dict
-
-
-def strip_null_value_string_dict():
-    ios_module_string = get_ios_string_dict_by_module()
-    module_string = {}
-    for (module_name, value) in ios_module_string.items():
-        list_d = ios_module_string.get(module_name)
-        if list_d.__len__() == 0:
-            continue
-        print("list_d = " + str(list_d.__len__()) + ", module_name = " + module_name)
-        module_string[module_name] = list_d
-        for d in list_d:
-            print("ddddd = " + str(d))
-    return module_string
-
-
 if __name__ == '__main__':
-    print("get_ios_project_string_dict_by_module() ", len(get_ios_string_dict_by_module()))
+    for module_name in get_ios_string_dict_by_module().keys():
+        print("get_ios_project_string_dict_by_module(), module_name = ", module_name)
