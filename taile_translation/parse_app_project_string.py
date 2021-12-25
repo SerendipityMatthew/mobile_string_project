@@ -14,7 +14,8 @@ from Taile_String import TaileString
 from ios_string import IOS_String
 from parse_ios_strings import get_ios_project_string_dict, get_ios_project_string_dict_all
 from parse_module import get_app_project_module, project_path
-from read_ini_utils import get_android_strings_files, get_targe_language, get_generate_excel_file_name
+from read_ini_utils import get_android_strings_files, get_generate_excel_file_name, \
+    get_target_language
 
 multination_string_excel_file = "correct_translation.xlsx"
 final_multination_string_excel_file = "hello_translation.xlsx"
@@ -899,7 +900,7 @@ def generate_string_excel(string_dict):
     cell_style = module_name_cell_style()
     # 写文件的头
     sheet.write(0, 0, "中文字符串")
-    sheet.write(0, 1, get_targe_language())  # 韩语字符串
+    sheet.write(0, 1, get_target_language())  # 韩语字符串
     sheet.write(0, 2, "android 模块和资源id")
     sheet.write(0, 3, "ios 模块和资源id")  # 韩语字符串
     # 遍历 所有的 字符串资源

@@ -21,8 +21,8 @@ def get_android_project_path() -> str:
     return config.get('project', 'android_project_path').strip("\n")
 
 
-def get_targe_language() -> str:
-    return config.get('project', 'targe_language').strip("\n")
+def get_target_language() -> str:
+    return config.get('project', 'target_language').strip("\n")
 
 
 def get_generate_excel_file_name() -> str:
