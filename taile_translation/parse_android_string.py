@@ -281,13 +281,15 @@ def translated_string(text: str, lang: str):
     return get_translation_text(text=text, target_lang=lang)
 
 
-def generate_android_res(string_value_dict: dict, target_langage: str, file_path: str):
+def generate_android_res(string_value_dict: dict, target_language: str, save_str_file_path: str):
     """
     将 android 的字符串 写成 android的 strings.xml 的格式
     如何生成这些 android 的字符串,将这些字符串按照不同的语言, 不同模块再次划分一下, 比较好, 也就是写到同一个文件里的, 放到一个 dict 里面
     """
     from xml.etree.ElementTree import Element, SubElement, ElementTree
-    file_path_dir = file_path.rstrip("strings.xml")
+    print("generate_android_res save_str_file_path = " + str(save_str_file_path))
+    file_name = save_str_file_path.split("/")[-1]
+    file_path_dir = save_str_file_path.replace(file_name, "")
     if os.path.exists(file_path_dir):
         pass
     else:
@@ -300,13 +302,13 @@ def generate_android_res(string_value_dict: dict, target_langage: str, file_path
         if string_value is None:
             print("string_value is nan = ", string_value)
         string_value_str = str(string_value.english_us)
-        if target_langage == "JA":
+        if target_language == "JA":
             string_value_str = str(string_value.japan)
-        if target_langage == "EN-US":
+        if target_language == "EN-US":
             string_value_str = str(string_value.english_us)
-        if target_langage == "ZH-CN":
+        if target_language == "ZH-CN":
             string_value_str = str(string_value.zh_cn)
-        if target_langage == "KO":
+        if target_language == "KO":
             string_value_str = str(string_value.korean)
         if string_value_str == "":
             continue
@@ -315,9 +317,8 @@ def generate_android_res(string_value_dict: dict, target_langage: str, file_path
         head.attrib["name"] = name_key
         head.text = string_value_str
     tree = ElementTree(root)
-    print("generate_string_res: tree = " + str(tree))
-    tree.write(file_path, encoding='utf-8')
-    pretty_xml_to_file(file_path, "./")
+    tree.write(save_str_file_path, encoding='utf-8')
+    pretty_xml_to_file(save_str_file_path, "./")
 
 
 def divide_string_dict_by_file(string_dict: dict) -> dict:
@@ -406,12 +407,14 @@ if __name__ == '__main__':
     for string_id in android_string_dict.keys():
         android_string: MobileString = android_string_dict[string_id]
         print("get_android_string_dict_by_string_id(), android_string = ", android_string)
+        if android_string.zh_cn == "":
+            continue
         trimmed_module = android_string.module_name
         if trimmed_module.startswith("/"):
             trimmed_module = trimmed_module.lstrip("/")
         for target_lang in get_target_languages():
             if target_lang == "EN-US":
-                android_string.english_us = translate(android_string.zh_cn, "en", "zh-CN")
+                # android_string.english_us = translate(android_string.zh_cn, "en", "zh-CN")
                 file_path = android_string.english_us_file
                 if file_path.startswith("//"):
                     file_path = file_path.replace("//", "")
@@ -428,7 +431,7 @@ if __name__ == '__main__':
                                 file_group[-1]
                 android_string.english_us_file = file_path
             if target_lang == "JA":
-                android_string.japan = translate(android_string.zh_cn, "ja", "zh-CN")
+                # android_string.japan = translate(android_string.zh_cn, "ja", "zh-CN")
                 file_path = android_string.japan_file
                 if file_path.startswith("//"):
                     file_path = file_path.replace("//", "")
@@ -459,7 +462,7 @@ if __name__ == '__main__':
                     language_path = file_group[-2] + "/" + file_group[-1]
                     file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ko-rKR/" + \
                                 file_group[-1]
-                android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
+                # android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
                 android_string.korean_file = file_path
             print("android_string  === ", android_string)
         android_string_dict[string_id] = android_string
