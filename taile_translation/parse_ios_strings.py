@@ -2,8 +2,10 @@ import os
 
 import chardet
 
+from google_trans_api import translate
 from mobile_string import MobileString
-from read_ini_utils import get_ios_strings_files, get_ios_project_path
+from parse_android_string import divide_string_dict_by_file
+from read_ini_utils import get_ios_strings_files, get_ios_project_path, get_target_languages
 
 """
 只获取该项目的英文翻译的字段和中文翻译的字段, 然后基于英文和中文去对比和比较
@@ -14,15 +16,19 @@ ios_app_project_path = get_ios_project_path()
 def get_all_files_list(path: str, all_file_list: list) -> list:
     app_file = os.walk(path)
     print("=========== file_full_path file_list app_file = ", app_file)
+    print("=========== file_full_path file_list path = ", path)
     for path, dir_list, file_list in app_file:
         for file in file_list:
             file_path = os.path.join(path, file)
             all_file_list.append(file_path)
             # print("=========== file_full_path file_list file = ", path, "    ", file)
         for dir_name in dir_list:
-            get_all_files_list(dir_name, all_file_list)
-    print("the strings file of the project, total " + str(all_file_list.__len__()))
+            get_all_files_list(path + os.sep + dir_name, all_file_list)
     return all_file_list
+
+
+def remove_duplicate(list1) -> list:
+    return list(set(list1))
 
 
 def get_all_strings_file(module_name, module_string_path):
@@ -37,7 +43,9 @@ def get_all_strings_file(module_name, module_string_path):
         过滤出所有的符合条件的 strings 文件
     :return:
     """
-    file_list = get_all_files_list(module_string_path + os.sep + module_name, [])
+    print("the all strings file of ios project: ", str(module_string_path + os.sep + module_name))
+
+    file_list = remove_duplicate(get_all_files_list(module_string_path + os.sep + module_name, []))
     ios_string_list = list(filter(lambda x: str(x).endswith(".strings"),
                                   file_list))
     print("the all strings file of ios project: ", len(ios_string_list))
@@ -85,19 +93,24 @@ def get_encoding(file):
         return chardet.detect(f.read())['encoding']
 
 
-def read_strings_from_file(module_name: str, file_path):
+def read_strings_from_file(module_name: str, file_path_a: str):
     ios_string_list = []
-    encoding = get_encoding(file_path)
-    print("read_strings_from_file: encoding = ", encoding, " file_path " + file_path)
+    encoding = get_encoding(file_path_a)
+    print("read_strings_from_file: file_path_a " + file_path_a)
+    print("read_strings_from_file: module_name " + module_name)
     """
     这些 Windows-1254 和 EUC-TW 编码统一归为 UTF-8 编码
     """
     if encoding == "Windows-1254" or encoding == "EUC-TW":
         encoding = "utf-8"
-    relative_file_path = file_path.split(ios_app_project_path)[1]
+    relative_file_path = file_path_a.split(ios_app_project_path)[1]
+    if str(relative_file_path).startswith("/"):
+        relative_file_path = str(relative_file_path).lstrip("/")
+    if str(relative_file_path).startswith("/"):
+        relative_file_path = str(relative_file_path).lstrip("/")
     print("read_strings_from_file: encoding = ", encoding, " relative_file_path " + relative_file_path)
 
-    with open(file=file_path, encoding=encoding) as f:
+    with open(file=file_path_a, encoding=encoding) as f:
         file_string = f.readlines()
 
         for string in file_string:
@@ -265,6 +278,112 @@ def get_ios_string_dict_by_module() -> dict:
     return module_string_dict
 
 
+def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
+    suffix = filePath.split("/")[-1]
+    file_path_dir = filePath.replace(suffix, "")
+    print("=========== filePath ", filePath, ", suffix = ", suffix)
+    print("=========== filePath ", filePath, ", target_language , ", target_language)
+    print("=========== file_path_dir ", file_path_dir, ", target_language , ", target_language)
+    if os.path.exists(file_path_dir):
+        pass
+    else:
+        os.makedirs(name=file_path_dir)
+    print("generate_ios_res: string_line: len(string_dict) = ", len(string_dict))
+
+    with open(filePath, mode="w+") as f:
+        for ios_string_key in string_dict.keys():
+            print("generate_ios_res: string_line: ios_string_key = ", ios_string_key)
+            if ios_string_key == "":
+                continue
+            string_value = string_dict[ios_string_key]
+            string_value_str = str(string_value.english_us)
+            if target_language == "JA":
+                string_value_str = str(string_value.japan)
+            if target_language == "EN-US":
+                string_value_str = str(string_value.english_us)
+            if target_language == "ZH-CN":
+                string_value_str = str(string_value.zh_cn)
+            if target_language == "KO":
+                string_value_str = str(string_value.korean)
+            if string_value_str == "":
+                continue
+            string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + string_value_str + "\";\n"
+            print("generate_ios_res: string_line: string_value_str = ", string_value_str)
+            f.write(string_line)
+
+
 if __name__ == '__main__':
-    for module_name in get_ios_string_dict_by_module().keys():
-        print("get_ios_project_string_dict_by_module(), module_name = ", module_name)
+    ios_string_dict = get_ios_string_dict_by_string_id()
+    print("get_ios_string_dict_by_module(), len(ios_string_dict) = ", len(ios_string_dict))
+    # get_filtered_strings_file("IMSMessage", ios_app_project_path)
+    for string_id in ios_string_dict.keys():
+        ios_string: MobileString = ios_string_dict[string_id]
+        print("get_ios_string_dict_by_module(), android_string = ", ios_string)
+        if ios_string is None:
+            continue
+        trimmed_module = ios_string.module_name
+        if trimmed_module.startswith("/"):
+            trimmed_module = trimmed_module.lstrip("/")
+        for target_lang in get_target_languages():
+            if target_lang == "ZH-CN":
+                # ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
+                file_path = ios_string.zh_cn_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== ios_string.zh_cn_file = ", file_path)
+                ios_string.zh_cn_file = file_path
+            if target_lang == "EN-US":
+                # ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
+                file_path = ios_string.english_us_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== ios_string.english_us_file = ", file_path)
+                ios_string.english_us_file = file_path
+            if target_lang == "JA":
+                file_path = ios_string.japan_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== ios_string.japan_file = ", file_path)
+                # ios_string.japan = translate(ios_string.zh_cn, "ja", "zh-CN")
+                ios_string.japan_file = file_path
+            if target_lang == "KO":
+                file_path = ios_string.korean_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== ios_string.korean_file = ", file_path)
+                # ios_string.korean = translate(ios_string.zh_cn, "ko", "zh-CN")
+                ios_string.korean_file = file_path
+            print("android_string  === ", ios_string)
+        ios_string_dict[string_id] = ios_string
+    # generate_android_res(android_string_dict)
+    divider_by_file = divide_string_dict_by_file(ios_string_dict)
+    for file_key in divider_by_file.keys():
+        print("================ file_key = ", file_key)
+        string_list = divider_by_file.get(file_key)
+
+        string_list_dict = {}
+        if string_list is None:
+            continue
+        if len(string_list) == 0:
+            continue
+        """
+        重新规整一下字符串, 放在字典里面
+        """
+        for string in string_list:
+            string_list_dict[string.string_id] = string
+        if str(file_key).__contains__("zh.lproj"):
+            generate_ios_res(string_list_dict, "ZH-CN", file_key)
+        if str(file_key).__contains__("en.lproj"):
+            generate_ios_res(string_list_dict, "EN-US", file_key)
+        if str(file_key).__contains__("ja.lproj"):
+            generate_ios_res(string_list_dict, "JA", file_key)
+        if str(file_key).__contains__("ko.lproj"):
+            generate_ios_res(string_list_dict, "KO", file_key)

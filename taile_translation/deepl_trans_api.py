@@ -1,6 +1,7 @@
 import deepl
 
 auth_key = ""
+target_language = "JA"
 translator = deepl.Translator(auth_key)
 
 

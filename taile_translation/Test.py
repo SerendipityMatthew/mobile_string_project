@@ -3,7 +3,10 @@
 '''
 demo 文件
 '''
+import os
+
 import xlwt
+
 
 # workbook = xlwt.Workbook()
 # worksheet = workbook.add_sheet('My sheet')
@@ -28,23 +31,23 @@ import xlwt
 # worksheet.write_merge(4, 6, 3, 6, 'My merge', style)
 
 # workbook.save('Merge_cell.xls')
+def remove_duplicate(list1) -> list:
+    return list(set(list1))
 
-string_xml_file = "/Volumes/Mathew/code/mxchip/mxapp_smartplus_android/page-device-add/src/main/res/values-zh-rCN/strings.xml"
 
-import xml.etree.cElementTree as ElementTree
+def get_all_files_list(path: str, all_file_list: list) -> list:
+    app_file = os.walk(path)
+    print("=========== file_full_path file_list app_file = ", app_file)
+    print("=========== file_full_path file_list path = ", path)
+    for path, dir_list, file_list in app_file:
+        for file in file_list:
+            file_path = os.path.join(path, file)
+            all_file_list.append(file_path)
+            # print("=========== file_full_path file_list file = ", path, "    ", file)
+        for dir_name in dir_list:
+            get_all_files_list(path + os.sep + dir_name, all_file_list)
+    return all_file_list
 
-tree = ElementTree.ElementTree(file=string_xml_file)
 
-root = tree.getroot()
-for child in root:
-    print(child.tag)
-    if str(child.tag).__eq__("string-array"):
-        for hello in child.iter():
-            print("string-array = " + str(hello.text))
-    else:
-        print(child.attrib["name"])
-
-for element in tree.iter():
-    # print(element)
-    pass
-
+all = get_all_files_list("/Volumes/Matthew/code/mxchip/mxapp_smartplus_ios", [])
+print("the strings file of the project, remove_duplicate, total = " + str((remove_duplicate(all)).__len__()))

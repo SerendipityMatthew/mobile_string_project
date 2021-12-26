@@ -227,7 +227,7 @@ def merge_mobile_string_object(cache_string: MobileString, append_string: Mobile
             cache_string.spanish = append_string.spanish
             cache_string.spanish_file = append_string.spanish_file
 
-    print("merge_mobile_string_object cache_string = ", cache_string)
+    # print("merge_mobile_string_object cache_string = ", cache_string)
     return cache_string
 
 
@@ -329,6 +329,8 @@ def divide_string_dict_by_file(string_dict: dict) -> dict:
     # global zh_cn_lang_file_list
     for mobile_string_id in string_dict.keys():
         mobileString: MobileString = string_dict.get(mobile_string_id)
+        if mobileString is None:
+            continue
         print("lang_file_l ist mobileString =", mobileString)
         if mobileString.zh_cn_file != "":
             # try:
@@ -338,7 +340,6 @@ def divide_string_dict_by_file(string_dict: dict) -> dict:
             if zh_cn_lang_file_list is None:
                 zh_cn_lang_file_list = []
 
-            print("zh_cn_lang_file_list = ", (zh_cn_lang_file_list))
             zh_cn_lang_file_list.append(mobileString)
             string_by_file_dict[mobileString.zh_cn_file] = zh_cn_lang_file_list
             # lang_file_list.clear()
@@ -409,10 +410,10 @@ if __name__ == '__main__':
             trimmed_module = trimmed_module.lstrip("/")
         for target_lang in get_target_languages():
             if target_lang == "EN-US":
-                android_string.english_us = translated_string(android_string.zh_cn, lang=target_lang)
+                android_string.english_us = translate(android_string.zh_cn, "en", "zh-CN")
                 android_string.english_us_file = trimmed_module + "/src/main/res/values-en-rUS/strings.xml"
             if target_lang == "JA":
-                android_string.japan = translated_string(android_string.zh_cn, lang=target_lang)
+                android_string.japan = translate(android_string.zh_cn, "ja", "zh-CN")
                 android_string.japan_file = trimmed_module + "/src/main/res/values-ja-rJP/strings.xml"
             if target_lang == "KO":
                 android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
