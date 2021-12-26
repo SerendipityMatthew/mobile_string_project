@@ -47,7 +47,7 @@ def get_all_strings_file(module_name, module_string_path):
     android_string_list = list(filter(lambda x: str(x).endswith("string.xml")
                                                 or str(x).endswith("strings.xml"),
                                       file_list))
-    print("the all strings file of androidcom_alibaba_sdk_android_openaccount_google_activity_invalid project: ",
+    print("the all strings file of android project size is: ",
           len(android_string_list))
     return android_string_list
 
@@ -441,7 +441,8 @@ if __name__ == '__main__':
                     """
                     file_group = android_string.zh_cn_file.split("/")
                     language_path = file_group[-2] + "/" + file_group[-1]
-                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ja-rJP/" + file_group[-1]
+                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ja-rJP/" + \
+                                file_group[-1]
                 android_string.japan_file = file_path
             if target_lang == "KO":
                 file_path = android_string.korean_file
@@ -456,7 +457,8 @@ if __name__ == '__main__':
                     """
                     file_group = android_string.zh_cn_file.split("/")
                     language_path = file_group[-2] + "/" + file_group[-1]
-                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ko-rKR/" + file_group[-1]
+                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ko-rKR/" + \
+                                file_group[-1]
                 android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
                 android_string.korean_file = file_path
             print("android_string  === ", android_string)
