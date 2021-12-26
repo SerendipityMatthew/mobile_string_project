@@ -326,7 +326,7 @@ if __name__ == '__main__':
             trimmed_module = trimmed_module.lstrip("/")
         for target_lang in get_target_languages():
             if target_lang == "ZH-CN":
-                # ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
+                ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
                 file_path = ios_string.zh_cn_file
                 if file_path.startswith("//"):
                     file_path = file_path.replace("//")
@@ -335,7 +335,7 @@ if __name__ == '__main__':
                 print("==================== ios_string.zh_cn_file = ", file_path)
                 ios_string.zh_cn_file = file_path
             if target_lang == "EN-US":
-                # ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
+                ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
                 file_path = ios_string.english_us_file
                 if file_path.startswith("//"):
                     file_path = file_path.replace("//")
@@ -350,20 +350,27 @@ if __name__ == '__main__':
                 if file_path.startswith("/"):
                     file_path = file_path.lstrip("/")
                 print("==================== ios_string.japan_file = ", file_path)
-                # ios_string.japan = translate(ios_string.zh_cn, "ja", "zh-CN")
+                ios_string.japan = translate(ios_string.zh_cn, "ja", "zh-CN")
                 ios_string.japan_file = file_path
             if target_lang == "KO":
                 file_path = ios_string.korean_file
                 if file_path.startswith("//"):
-                    file_path = file_path.replace("//")
+                    file_path = file_path.replace("//", "")
                 if file_path.startswith("/"):
                     file_path = file_path.lstrip("/")
                 print("==================== ios_string.korean_file = ", file_path)
-                # ios_string.korean = translate(ios_string.zh_cn, "ko", "zh-CN")
+                if file_path == "":
+                    """
+                    当发生缺少该字符串的的文件路径的时候, 我们从中文字符串,中文字符串路径借过来
+                    """
+                    file_group = ios_string.zh_cn_file.split("/")
+                    language_path = file_group[-2] + "/" + file_group[-1]
+                    file_path = str(ios_string.zh_cn_file).replace(language_path, "") + "ko.lproj/" +file_group[-1]
+                print("==================== ios_string.korean_file 111 = ", file_path)
+                ios_string.korean = translate(ios_string.zh_cn, "ko", "zh-CN")
                 ios_string.korean_file = file_path
             print("android_string  === ", ios_string)
         ios_string_dict[string_id] = ios_string
-    # generate_android_res(android_string_dict)
     divider_by_file = divide_string_dict_by_file(ios_string_dict)
     for file_key in divider_by_file.keys():
         print("================ file_key = ", file_key)
