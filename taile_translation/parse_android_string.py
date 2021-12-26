@@ -3,9 +3,8 @@ import os
 import chardet
 
 from deepl_trans_api import get_translation_text
-from google_trans_api import translate
+from google_trans_api import translate, translate_by_api
 from mobile_string import MobileString
-from parse_excel import generate_module_string_to_xml
 from parse_module import get_app_project_module
 from read_ini_utils import get_android_project_path, get_android_strings_files, \
     get_target_languages
@@ -414,7 +413,7 @@ if __name__ == '__main__':
             trimmed_module = trimmed_module.lstrip("/")
         for target_lang in get_target_languages():
             if target_lang == "EN-US":
-                # android_string.english_us = translate(android_string.zh_cn, "en", "zh-CN")
+                android_string.english_us = get_translation_text(android_string.zh_cn, "EN-US")
                 file_path = android_string.english_us_file
                 if file_path.startswith("//"):
                     file_path = file_path.replace("//", "")
@@ -431,7 +430,7 @@ if __name__ == '__main__':
                                 file_group[-1]
                 android_string.english_us_file = file_path
             if target_lang == "JA":
-                # android_string.japan = translate(android_string.zh_cn, "ja", "zh-CN")
+                android_string.japan = get_translation_text(android_string.zh_cn, "JA")
                 file_path = android_string.japan_file
                 if file_path.startswith("//"):
                     file_path = file_path.replace("//", "")
@@ -454,6 +453,7 @@ if __name__ == '__main__':
                 if file_path.startswith("/"):
                     file_path = file_path.lstrip("/")
                 print("==================== android_string.korean_file = ", file_path)
+                print("==================== android_string.korean_file android_string.zh_cn = ", android_string.zh_cn)
                 if file_path == "":
                     """
                     当发生缺少该字符串的的文件路径的时候, 我们从中文字符串,中文字符串路径借过来
@@ -462,7 +462,7 @@ if __name__ == '__main__':
                     language_path = file_group[-2] + "/" + file_group[-1]
                     file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ko-rKR/" + \
                                 file_group[-1]
-                # android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
+                android_string.korean = translate_by_api(android_string.zh_cn, "ko", "zh-CN")
                 android_string.korean_file = file_path
             print("android_string  === ", android_string)
         android_string_dict[string_id] = android_string
