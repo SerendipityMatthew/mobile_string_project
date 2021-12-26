@@ -20,16 +20,11 @@ android_app_project_path = get_android_project_path()
 
 
 def get_all_files_list(path: str, all_file_list: list) -> list:
-    app_file = os.walk(path)
-    # print("=========== file_full_path file_list app_file = ", app_file)
-    for path, dir_list, file_list in app_file:
+    print("=========== file_full_path file_list path = ", path)
+    for parent, dir_list, file_list in os.walk(path):
         for file in file_list:
-            file_path = os.path.join(path, file)
-            all_file_list.append(file_path)
-            # print("=========== file_full_path file_list file = ", path, "    ", file)
-        for dir_name in dir_list:
-            get_all_files_list(dir_name, all_file_list)
-    # print("the strings file of the project, total " + str(all_file_list.__len__()))
+            file_path_a = os.path.join(parent, file)
+            all_file_list.append(file_path_a)
     return all_file_list
 
 
@@ -45,7 +40,10 @@ def get_all_strings_file(module_name, module_string_path):
         过滤出所有的符合条件的 strings 文件
     :return:
     """
+    file_path = module_string_path + os.sep + module_name
     file_list = get_all_files_list(module_string_path + os.sep + module_name, [])
+    print("the all strings file of get_all_strings_file file_path = ", file_path)
+    print("the all strings file of get_all_strings_file ", len(file_list))
     android_string_list = list(filter(lambda x: str(x).endswith("string.xml")
                                                 or str(x).endswith("strings.xml"),
                                       file_list))
@@ -58,6 +56,7 @@ def get_filtered_strings_file(module_name, module_string_path):
     all_string_list = get_all_strings_file(module_name, module_string_path)
     wanted_file_list = get_android_strings_files()
     print("get_filtered_strings_file, wanted_file_list ", len(wanted_file_list))
+    print("get_filtered_strings_file, all_string_list ", len(all_string_list))
 
     filtered_file_list = []
 
@@ -237,6 +236,8 @@ def get_android_string_dict_by_string_id() -> dict:
     print("the all android module size is ", len(module_list))
 
     for module in module_list:
+        print("the current module is = ", module)
+
         string_file_list = get_filtered_strings_file(module, android_app_project_path)
         if len(string_file_list) == 0:
             continue
@@ -411,13 +412,53 @@ if __name__ == '__main__':
         for target_lang in get_target_languages():
             if target_lang == "EN-US":
                 android_string.english_us = translate(android_string.zh_cn, "en", "zh-CN")
-                android_string.english_us_file = trimmed_module + "/src/main/res/values-en-rUS/strings.xml"
+                file_path = android_string.english_us_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//", "")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== android_string.english_us_file = ", file_path)
+                if file_path == "":
+                    """
+                    当发生缺少该字符串的的文件路径的时候, 我们从中文字符串,中文字符串路径借过来
+                    """
+                    file_group = android_string.zh_cn_file.split("/")
+                    language_path = file_group[-2] + "/" + file_group[-1]
+                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-en-rUS/" + \
+                                file_group[-1]
+                android_string.english_us_file = file_path
             if target_lang == "JA":
                 android_string.japan = translate(android_string.zh_cn, "ja", "zh-CN")
-                android_string.japan_file = trimmed_module + "/src/main/res/values-ja-rJP/strings.xml"
+                file_path = android_string.japan_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//", "")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== android_string.japan_file = ", file_path)
+                if file_path == "":
+                    """
+                    当发生缺少该字符串的的文件路径的时候, 我们从中文字符串,中文字符串路径借过来
+                    """
+                    file_group = android_string.zh_cn_file.split("/")
+                    language_path = file_group[-2] + "/" + file_group[-1]
+                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ja-rJP/" + file_group[-1]
+                android_string.japan_file = file_path
             if target_lang == "KO":
+                file_path = android_string.korean_file
+                if file_path.startswith("//"):
+                    file_path = file_path.replace("//", "")
+                if file_path.startswith("/"):
+                    file_path = file_path.lstrip("/")
+                print("==================== android_string.korean_file = ", file_path)
+                if file_path == "":
+                    """
+                    当发生缺少该字符串的的文件路径的时候, 我们从中文字符串,中文字符串路径借过来
+                    """
+                    file_group = android_string.zh_cn_file.split("/")
+                    language_path = file_group[-2] + "/" + file_group[-1]
+                    file_path = str(android_string.zh_cn_file).replace(language_path, "") + "values-ko-rKR/" + file_group[-1]
                 android_string.korean = translate(android_string.zh_cn, "ko", "zh-CN")
-                android_string.korean_file = trimmed_module + "/src/main/res/values-ko-rKR/strings.xml"
+                android_string.korean_file = file_path
             print("android_string  === ", android_string)
         android_string_dict[string_id] = android_string
     # generate_android_res(android_string_dict)
@@ -432,7 +473,7 @@ if __name__ == '__main__':
             continue
         for hello in string_list:
             string_list_dict[hello.string_id] = hello
-        if str(file_key).__contains__("values-zh-rCN"):
+        if str(file_key).__contains__("values-zh-rCN") or str(file_key).__contains__("values/string"):
             generate_android_res(string_list_dict, "ZH-CN", file_key)
         if str(file_key).__contains__("values-en-rUS"):
             generate_android_res(string_list_dict, "EN-US", file_key)

@@ -67,7 +67,7 @@ def get_app_project_module():
     print("src ================ " + src)
     if os.path.exists(src):
         print("common src path is exist")
-        src_module = project_name + os.sep + "src"
+        src_module = "src"
         module_path_list.append(src_module)
 
     app_src = project_path + "app/src"

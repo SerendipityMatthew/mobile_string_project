@@ -17,13 +17,10 @@ def get_all_files_list(path: str, all_file_list: list) -> list:
     app_file = os.walk(path)
     print("=========== file_full_path file_list app_file = ", app_file)
     print("=========== file_full_path file_list path = ", path)
-    for path, dir_list, file_list in app_file:
+    for parent, dir_list, file_list in os.walk(path):
         for file in file_list:
-            file_path = os.path.join(path, file)
-            all_file_list.append(file_path)
-            # print("=========== file_full_path file_list file = ", path, "    ", file)
-        for dir_name in dir_list:
-            get_all_files_list(path + os.sep + dir_name, all_file_list)
+            file_path_a = os.path.join(parent, file)
+            all_file_list.append(file_path_a)
     return all_file_list
 
 
