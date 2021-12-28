@@ -12,6 +12,9 @@ class MobileString:
                  is_android_string=False, is_ios_string=False,
                  default_lang="",
 
+                 zh_tw="",
+                 zh_tw_file="",
+
                  spanish="",
                  spanish_file="",
 
@@ -42,6 +45,9 @@ class MobileString:
 
         self.zh_cn = zh_cn
         self.zh_cn_file = zh_cn_file
+
+        self.zh_tw = zh_tw
+        self.zh_tw_file = zh_tw_file
 
         self.english_us = english_us
         self.english_us_file = english_us_file

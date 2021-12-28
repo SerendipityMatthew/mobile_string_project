@@ -4,7 +4,6 @@ import chardet
 
 from google_trans_api import translate
 from mobile_string import MobileString
-from parse_android_string import divide_string_dict_by_file
 from read_ini_utils import get_ios_strings_files, get_ios_project_path, get_target_languages
 
 """
@@ -110,20 +109,20 @@ def read_strings_from_file(module_name: str, file_path_a: str):
     with open(file=file_path_a, encoding=encoding) as f:
         file_string = f.readlines()
 
-        for string in file_string:
+        for string_line in file_string:
 
-            if string.strip().__eq__(""):
+            if string_line.strip().__eq__(""):
                 continue
-            if not string.startswith("\""):
+            if not string_line.startswith("\""):
                 continue
             ios_string_id = ""
             ios_string_value = ""
-            if str(string).__contains__("\" = \""):  # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的
-                ios_string_id = string.split("\" ")[0].replace("\"", "")
-                ios_string_value = string.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
-            if str(string).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
-                ios_string_id = string.split("\"=\"")[0].replace("\"", "")
-                ios_string_value = string.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
+            if str(string_line).__contains__("\" = \""):  # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的
+                ios_string_id = string_line.split("\" ")[0].replace("\"", "")
+                ios_string_value = string_line.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
+            if str(string_line).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
+                ios_string_id = string_line.split("\"=\"")[0].replace("\"", "")
+                ios_string_value = string_line.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
             # print("module_name = ", module_name, ", ios_string_id = ", ios_string_id, ", ios_string_value = ",
             #       ios_string_value)
             ios_string_value = ios_string_value.strip("\n")
@@ -226,8 +225,88 @@ def merge_mobile_string_object(cache_string: MobileString, append_string: Mobile
             cache_string.spanish = append_string.spanish
             cache_string.spanish_file = append_string.spanish_file
 
-    print("merge_mobile_string_object cache_string = ", cache_string)
     return cache_string
+
+
+def divide_string_dict_by_file(string_dict: dict) -> dict:
+    """
+    将 android 的字符串 按照所要写的路径, 重新划分一下, 这样就可以一次性写一个文件
+    :param string_dict:
+    :return:
+    """
+    string_by_file_dict = {}
+    # global zh_cn_lang_file_list
+    for mobile_string_id in string_dict.keys():
+        mobileString: MobileString = string_dict.get(mobile_string_id)
+        if mobileString is None:
+            continue
+        print("lang_file_l ist mobileString =", mobileString)
+        if mobileString.zh_cn_file != "":
+            # try:
+            zh_cn_lang_file_list = string_by_file_dict.get(mobileString.zh_cn_file)
+            # except KeyError:
+            #     zh_cn_lang_file_list = []
+            if zh_cn_lang_file_list is None:
+                zh_cn_lang_file_list = []
+
+            zh_cn_lang_file_list.append(mobileString)
+            string_by_file_dict[mobileString.zh_cn_file] = zh_cn_lang_file_list
+            # lang_file_list.clear()
+
+        if mobileString.english_us_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.english_us_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            lang_file_list.append(mobileString)
+            string_by_file_dict[mobileString.english_us_file] = lang_file_list
+            # lang_file_list.clear()
+
+        if mobileString.spanish_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.spanish_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            lang_file_list.append(mobileString)
+            string_by_file_dict[mobileString.spanish_file] = lang_file_list
+            # lang_file_list.clear()
+
+        if mobileString.french_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.french_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            lang_file_list.append(mobileString)
+            string_by_file_dict[mobileString.french_file] = lang_file_list
+            # lang_file_list.clear()
+
+        if mobileString.russia_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.russia_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            string_by_file_dict[mobileString.russia_file] = lang_file_list.append(mobileString)
+            # lang_file_list.clear()
+
+        if mobileString.germany_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.germany_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            string_by_file_dict[mobileString.germany_file] = lang_file_list.append(mobileString)
+            # lang_file_list.clear()
+
+        if mobileString.korean_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.korean_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            lang_file_list.append(mobileString)
+            string_by_file_dict[mobileString.korean_file] = lang_file_list
+            # lang_file_list.clear()
+
+        if mobileString.japan_file != "":
+            lang_file_list = string_by_file_dict.get(mobileString.japan_file)
+            if lang_file_list is None:
+                lang_file_list = []
+            lang_file_list.append(mobileString)
+            string_by_file_dict[mobileString.japan_file] = lang_file_list
+            # lang_file_list.clear()
+    return string_by_file_dict
 
 
 def get_ios_string_dict_by_string_id() -> dict:
@@ -257,7 +336,7 @@ def get_ios_string_dict_by_string_id() -> dict:
             else:
                 merge_cache_string = merge_mobile_string_object(cache_string, string)
                 string_dict_by_id[string.string_id] = merge_cache_string
-
+    print("get_ios_string_dict_by_string_id, the all string is = ", len(string_dict_by_id))
     return string_dict_by_id
 
 
@@ -273,6 +352,102 @@ def get_ios_string_dict_by_module() -> dict:
     print("the all module string ", len(module_string_dict))
 
     return module_string_dict
+
+
+def get_source_text(mobile_string: MobileString) -> str:
+    """
+    输入一个 mobilestring 对象, 选择合适的
+    :param mobile_string:
+    :return:
+    """
+    if mobile_string.zh_cn is not None and mobile_string.zh_cn != "":
+        return mobile_string.zh_cn
+    elif mobile_string.zh_tw is not None and mobile_string.zh_tw != "":
+        return mobile_string.zh_tw
+    elif mobile_string.english_us is not None and mobile_string.english_us != "":
+        return mobile_string.english_us
+    elif mobile_string.french is not None and mobile_string.french != "":
+        return mobile_string.french
+    elif mobile_string.spanish is not None and mobile_string.spanish != "":
+        return mobile_string.spanish
+    elif mobile_string.germany is not None and mobile_string.germany != "":
+        return mobile_string.germany
+
+
+def get_source_text_file_path(mobile_string: MobileString) -> str:
+    full_file_path = ""
+    if mobile_string.zh_cn is not None and mobile_string.zh_cn != "":
+        full_file_path = mobile_string.zh_cn_file
+    elif mobile_string.zh_tw is not None and mobile_string.zh_tw != "":
+        full_file_path = mobile_string.zh_tw_file
+    elif mobile_string.english_us is not None and mobile_string.english_us != "":
+        full_file_path = mobile_string.english_us_file
+    elif mobile_string.french is not None and mobile_string.french != "":
+        full_file_path = mobile_string.french_file
+    elif mobile_string.spanish is not None and mobile_string.spanish != "":
+        full_file_path = mobile_string.spanish_file
+    elif mobile_string.germany is not None and mobile_string.germany != "":
+        full_file_path = mobile_string.germany_file
+    if full_file_path.startswith("/"):
+        full_file_path.lstrip("/")
+    if full_file_path.startswith("/"):
+        full_file_path.lstrip("/")
+    return full_file_path
+
+
+def get_common_string_file_path(mobile_string: MobileString) -> str:
+    file_path = get_source_text_file_path(mobile_string)
+    file_name = file_path.split("/")[-1]
+    lang_dir = file_path.split("/")[-2]
+    common_file_path = file_path.replace(lang_dir + "/" + file_name, "")
+    print("get_common_string_file_path: common_file_path = ", common_file_path)
+    if common_file_path.startswith("/"):
+        common_file_path = common_file_path.lstrip("/")
+    if common_file_path.startswith("/"):
+        common_file_path = common_file_path.lstrip("/")
+    print("get_common_string_file_path: trimmed common_file_path = ", common_file_path)
+
+    return common_file_path
+
+
+def get_string_file_name(mobile_string: MobileString) -> str:
+    file_path = get_source_text_file_path(mobile_string)
+    file_name = file_path.split("/")[-1]
+    return file_name
+
+
+def get_pending_translate_ios_string_dict() -> dict:
+    string_dict_by_id = get_ios_string_dict_by_string_id()
+    for string_id in string_dict_by_id.keys():
+        ios_string: MobileString = string_dict_by_id[string_id]
+        print("get_pending_translate_ios_string_dict(), android_string = ", ios_string)
+        if ios_string is None:
+            continue
+        for target_lang in get_target_languages():
+            common_file_path = get_common_string_file_path(ios_string)
+            print("get_pending_translate_ios_string_dict: common_file_path = ", common_file_path)
+
+            if common_file_path == "":
+                common_file_path
+            file_name = get_string_file_name(ios_string)
+            source_text = get_source_text(ios_string)
+            print("get_pending_translate_ios_string_dict: source_text = ", source_text)
+
+            if target_lang == "ZH-CN":
+                ios_string.english_us = translate(source_text, "en", "zh-CN")
+                ios_string.zh_cn_file = common_file_path + os.sep + "zh.lproj" + os.sep + file_name
+            if target_lang == "EN-US":
+                ios_string.english_us = translate(source_text, "en", "zh-CN")
+                ios_string.english_us_file = common_file_path + os.sep + "en.lproj" + os.sep + file_name
+            if target_lang == "JA":
+                ios_string.japan = translate(source_text, "ja", "zh-CN")
+                ios_string.japan_file = common_file_path + os.sep + "ja.lproj" + os.sep + file_name
+            if target_lang == "KO":
+                ios_string.korean = translate(source_text, "ko", "zh-CN")
+                ios_string.korean_file = common_file_path + os.sep + "ko.lproj" + os.sep + file_name
+            print("android_string  === ", ios_string)
+        string_dict_by_id[string_id] = ios_string
+    return string_dict_by_id
 
 
 def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
@@ -310,65 +485,9 @@ def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
 
 
 if __name__ == '__main__':
-    ios_string_dict = get_ios_string_dict_by_string_id()
-    print("get_ios_string_dict_by_module(), len(ios_string_dict) = ", len(ios_string_dict))
-    # get_filtered_strings_file("IMSMessage", ios_app_project_path)
-    for string_id in ios_string_dict.keys():
-        ios_string: MobileString = ios_string_dict[string_id]
-        print("get_ios_string_dict_by_module(), android_string = ", ios_string)
-        if ios_string is None:
-            continue
-        trimmed_module = ios_string.module_name
-        if trimmed_module.startswith("/"):
-            trimmed_module = trimmed_module.lstrip("/")
-        for target_lang in get_target_languages():
-            if target_lang == "ZH-CN":
-                ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
-                file_path = ios_string.zh_cn_file
-                if file_path.startswith("//"):
-                    file_path = file_path.replace("//")
-                if file_path.startswith("/"):
-                    file_path = file_path.lstrip("/")
-                print("==================== ios_string.zh_cn_file = ", file_path)
-                ios_string.zh_cn_file = file_path
-            if target_lang == "EN-US":
-                ios_string.english_us = translate(ios_string.zh_cn, "en", "zh-CN")
-                file_path = ios_string.english_us_file
-                if file_path.startswith("//"):
-                    file_path = file_path.replace("//")
-                if file_path.startswith("/"):
-                    file_path = file_path.lstrip("/")
-                print("==================== ios_string.english_us_file = ", file_path)
-                ios_string.english_us_file = file_path
-            if target_lang == "JA":
-                file_path = ios_string.japan_file
-                if file_path.startswith("//"):
-                    file_path = file_path.replace("//")
-                if file_path.startswith("/"):
-                    file_path = file_path.lstrip("/")
-                print("==================== ios_string.japan_file = ", file_path)
-                ios_string.japan = translate(ios_string.zh_cn, "ja", "zh-CN")
-                ios_string.japan_file = file_path
-            if target_lang == "KO":
-                file_path = ios_string.korean_file
-                if file_path.startswith("//"):
-                    file_path = file_path.replace("//", "")
-                if file_path.startswith("/"):
-                    file_path = file_path.lstrip("/")
-                print("==================== ios_string.korean_file = ", file_path)
-                if file_path == "":
-                    """
-                    当发生缺少该字符串的的文件路径的时候, 我们从中文字符串,中文字符串路径借过来
-                    """
-                    file_group = ios_string.zh_cn_file.split("/")
-                    language_path = file_group[-2] + "/" + file_group[-1]
-                    file_path = str(ios_string.zh_cn_file).replace(language_path, "") + "ko.lproj/" +file_group[-1]
-                print("==================== ios_string.korean_file 111 = ", file_path)
-                ios_string.korean = translate(ios_string.zh_cn, "ko", "zh-CN")
-                ios_string.korean_file = file_path
-            print("android_string  === ", ios_string)
-        ios_string_dict[string_id] = ios_string
-    divider_by_file = divide_string_dict_by_file(ios_string_dict)
+    pending_translation_ios_string_dict = get_pending_translate_ios_string_dict()
+    divider_by_file = divide_string_dict_by_file(pending_translation_ios_string_dict)
+    print("=================== len(divider_by_file) = ", len(divider_by_file))
     for file_key in divider_by_file.keys():
         print("================ file_key = ", file_key)
         string_list = divider_by_file.get(file_key)
