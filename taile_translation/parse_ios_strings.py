@@ -183,6 +183,12 @@ def read_strings_from_file(module_name: str, file_path_a: str):
 
 
 def merge_mobile_string_object(cache_string: MobileString, append_string: MobileString):
+    """
+    合并字符串, 强制规定 append_string 是合并到 cache_string 的
+    :param cache_string:
+    :param append_string:
+    :return:
+    """
     if cache_string.string_id is None:
         if append_string.string_id != "":
             cache_string.string_id = append_string.string_id
@@ -310,6 +316,10 @@ def divide_string_dict_by_file(string_dict: dict) -> dict:
 
 
 def get_ios_string_dict_by_string_id() -> dict:
+    """
+    以 string_id 为 key 的 字符串 dict
+    :return:
+    """
     module_list = get_all_module_name()
     ios_module_string_dict = {}
     print("the all ios module size is ", len(module_list))
@@ -341,6 +351,10 @@ def get_ios_string_dict_by_string_id() -> dict:
 
 
 def get_ios_string_dict_by_module() -> dict:
+    """
+    通过模块把字符串划分开
+    :return:
+    """
     string_dict_by_id = get_ios_string_dict_by_string_id()
     module_string_dict = {}
     for ios_string_id in string_dict_by_id.keys():
@@ -375,6 +389,11 @@ def get_source_text(mobile_string: MobileString) -> str:
 
 
 def get_source_text_file_path(mobile_string: MobileString) -> str:
+    """
+    优先选择中文字符串的文件路径作为共同的路径, 以后会优化为该语言的读取的文件路径,如果没有才选择其他的语言
+    :param mobile_string:
+    :return:
+    """
     full_file_path = ""
     if mobile_string.zh_cn is not None and mobile_string.zh_cn != "":
         full_file_path = mobile_string.zh_cn_file
@@ -411,6 +430,11 @@ def get_common_string_file_path(mobile_string: MobileString) -> str:
 
 
 def get_string_file_name(mobile_string: MobileString) -> str:
+    """
+    获取字符串的文件名称
+    :param mobile_string:
+    :return:
+    """
     file_path = get_source_text_file_path(mobile_string)
     file_name = file_path.split("/")[-1]
     return file_name

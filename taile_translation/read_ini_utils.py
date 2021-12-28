@@ -39,6 +39,16 @@ def get_generate_excel_file_name() -> str:
     return config.get('project', 'generate_excel_file_name').strip("\n")
 
 
+def is_translate_by_google() -> bool:
+    translation_api = config.get('project', 'translation_api').strip("\n").strip()
+    return translation_api == "google"
+
+
+def is_translate_by_deepl() -> bool:
+    translation_api = config.get('project', 'translation_api').strip("\n").strip()
+    return translation_api == "deepl"
+
+
 if __name__ == "__main__":
     print("get_android_strings_files() ", get_android_strings_files())
     print("get_ios_strings_files() ", get_ios_strings_files())
