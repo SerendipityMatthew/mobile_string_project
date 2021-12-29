@@ -2,7 +2,7 @@ import os
 
 import chardet
 
-from google_trans_api import translate
+from google_trans_api import translate, translate_text
 from mobile_string import MobileString
 from read_ini_utils import get_ios_strings_files, get_ios_project_path, get_target_languages
 
@@ -117,14 +117,18 @@ def read_strings_from_file(module_name: str, file_path_a: str):
                 continue
             ios_string_id = ""
             ios_string_value = ""
-            if str(string_line).__contains__("\" = \""):  # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的
+            if str(string_line).__contains__("\" = \""):  # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的, 等号两端都有空格
                 ios_string_id = string_line.split("\" ")[0].replace("\"", "")
                 ios_string_value = string_line.split("\" ")[1].replace("= ", "").replace(";", "").replace("\"", "")
-            if str(string_line).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的
-                ios_string_id = string_line.split("\"=\"")[0].replace("\"", "")
-                ios_string_value = string_line.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
-            # print("module_name = ", module_name, ", ios_string_id = ", ios_string_id, ", ios_string_value = ",
-            #       ios_string_value)
+            if ios_string_id == "":
+                if str(string_line).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的 等号两端都没有空格
+                    ios_string_id = string_line.split("\"=\"")[0].replace("\"", "")
+                    ios_string_value = string_line.split("\"=\"")[1].replace("= ", "").replace(";", "").replace("\"", "")
+            if ios_string_id == "":
+                if str(string_line).__contains__("\"= \""):  # "MXCHIP_upgrade_skip"= "暂不升级"; 类型的 等号右端有空格, 左侧没有空格的
+                    ios_string_id = string_line.split("\"= \"")[0].replace("\"", "")
+                    ios_string_value = string_line.split("\"= \"")[1].replace("= ", "").replace(";", "").replace("\"", "")
+
             ios_string_value = ios_string_value.strip("\n")
             if relative_file_path.__contains__("zh.lproj") or relative_file_path.__contains__("zh-Hans.lproj"):
                 ios_string = MobileString(module_name, string_id=ios_string_id,
@@ -416,14 +420,19 @@ def get_source_text_file_path(mobile_string: MobileString) -> str:
 
 def get_common_string_file_path(mobile_string: MobileString) -> str:
     file_path = get_source_text_file_path(mobile_string)
+    print("get_common_string_file_path: file_path = ", file_path)
+    print("get_common_string_file_path: file_path = ", mobile_string)
     file_name = file_path.split("/")[-1]
     lang_dir = file_path.split("/")[-2]
+
     common_file_path = file_path.replace(lang_dir + "/" + file_name, "")
     print("get_common_string_file_path: common_file_path = ", common_file_path)
     if common_file_path.startswith("/"):
         common_file_path = common_file_path.lstrip("/")
     if common_file_path.startswith("/"):
         common_file_path = common_file_path.lstrip("/")
+    if common_file_path.endswith("/"):
+        common_file_path = common_file_path.rstrip("/")
     print("get_common_string_file_path: trimmed common_file_path = ", common_file_path)
 
     return common_file_path
@@ -447,12 +456,14 @@ def get_pending_translate_ios_string_dict() -> dict:
         print("get_pending_translate_ios_string_dict(), android_string = ", ios_string)
         if ios_string is None:
             continue
+        if ios_string.string_id is None or ios_string.string_id == "":
+            continue
         for target_lang in get_target_languages():
             common_file_path = get_common_string_file_path(ios_string)
             print("get_pending_translate_ios_string_dict: common_file_path = ", common_file_path)
-
+            common_file_pat_with_sep = common_file_path + os.sep
             if common_file_path == "":
-                common_file_path
+                common_file_pat_with_sep = ""
             file_name = get_string_file_name(ios_string)
             source_text = get_source_text(ios_string)
             print("get_pending_translate_ios_string_dict: source_text = ", source_text)
@@ -464,8 +475,8 @@ def get_pending_translate_ios_string_dict() -> dict:
                 ios_string.english_us = translate(source_text, "en", "zh-CN")
                 ios_string.english_us_file = common_file_path + os.sep + "en.lproj" + os.sep + file_name
             if target_lang == "JA":
-                ios_string.japan = translate(source_text, "ja", "zh-CN")
-                ios_string.japan_file = common_file_path + os.sep + "ja.lproj" + os.sep + file_name
+                ios_string.japan = translate_text(source_text, "JA", "zh-CN")
+                ios_string.japan_file = common_file_pat_with_sep + "ja.lproj" + os.sep + file_name
             if target_lang == "KO":
                 ios_string.korean = translate(source_text, "ko", "zh-CN")
                 ios_string.korean_file = common_file_path + os.sep + "ko.lproj" + os.sep + file_name
@@ -492,7 +503,8 @@ def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
             if ios_string_key == "":
                 continue
             string_value = string_dict[ios_string_key]
-            string_value_str = str(string_value.english_us)
+            print("generate_ios_res: string_line: target_language = ", target_language)
+
             if target_language == "JA":
                 string_value_str = str(string_value.japan)
             if target_language == "EN-US":
@@ -504,7 +516,7 @@ def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
             if string_value_str == "":
                 continue
             string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + string_value_str + "\";\n"
-            print("generate_ios_res: string_line: string_value_str = ", string_value_str)
+            print("generate_ios_res: string_line: string_line = ", string_line)
             f.write(string_line)
 
 
@@ -515,6 +527,7 @@ if __name__ == '__main__':
     for file_key in divider_by_file.keys():
         print("================ file_key = ", file_key)
         string_list = divider_by_file.get(file_key)
+        print("================ len(string_list) = ", len(string_list))
 
         string_list_dict = {}
         if string_list is None:
@@ -524,13 +537,19 @@ if __name__ == '__main__':
         """
         重新规整一下字符串, 放在字典里面
         """
+
         for string in string_list:
             string_list_dict[string.string_id] = string
-        if str(file_key).__contains__("zh.lproj"):
-            generate_ios_res(string_list_dict, "ZH-CN", file_key)
-        if str(file_key).__contains__("en.lproj"):
-            generate_ios_res(string_list_dict, "EN-US", file_key)
-        if str(file_key).__contains__("ja.lproj"):
-            generate_ios_res(string_list_dict, "JA", file_key)
-        if str(file_key).__contains__("ko.lproj"):
-            generate_ios_res(string_list_dict, "KO", file_key)
+        for target_lang in get_target_languages():
+            if target_lang == "ZH-CN":
+                if str(file_key).__contains__("zh.lproj"):
+                    generate_ios_res(string_list_dict, "ZH-CN", file_key)
+            if target_lang == "EN-US":
+                if str(file_key).__contains__("en.lproj"):
+                    generate_ios_res(string_list_dict, "EN-US", file_key)
+            if target_lang == "JA":
+                if str(file_key).__contains__("ja.lproj"):
+                    generate_ios_res(string_list_dict, "JA", file_key)
+            if target_lang == "KO":
+                if str(file_key).__contains__("ko.lproj"):
+                    generate_ios_res(string_list_dict, "KO", file_key)
