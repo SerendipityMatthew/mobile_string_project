@@ -3,12 +3,12 @@ import os.path
 
 class LangString:
     def __init__(self,
-                 module_name: str,
-                 string_id: str,
-                 common_path: str,
-                 lang_dir: str,
-                 file_name: str,
-                 content: str
+                 module_name: str = "",
+                 string_id: str = "",
+                 common_path: str = "",
+                 lang_dir: str = "",
+                 file_name: str = "",
+                 content: str = ""
                  ):
         self.module_name = module_name
         self.string_id = string_id

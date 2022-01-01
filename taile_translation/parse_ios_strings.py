@@ -13,6 +13,11 @@ from read_ini_utils import get_ios_strings_files, get_ios_project_path, get_targ
 ios_app_project_path = get_ios_project_path()
 
 
+def get_project_name():
+    project_name = ios_app_project_path.split("/")[-1]
+    return project_name
+
+
 def get_all_files_list(path: str, all_file_list: list) -> list:
     app_file = os.walk(path)
     print("=========== file_full_path file_list app_file = ", app_file)
@@ -84,6 +89,18 @@ def get_all_module_name():
 string_file_dict = {}
 
 
+def remove_suffix(input_string, suffix):
+    if suffix and input_string.endswith(suffix):
+        return input_string[:-len(suffix)]
+    return input_string
+
+
+def remove_prefix(input_string, prefix):
+    if prefix and (str(input_string)).startswith(prefix):
+        return input_string[1:len(input_string)]
+    return input_string
+
+
 def get_encoding(file):
     # 二进制方式读取，获取字节数据，检测类型
     with open(file, 'rb') as f:
@@ -115,6 +132,9 @@ def read_strings_from_file(module_name: str, file_path_a: str) -> list:
     if len(relative_common_path_list) != 0:
         for path in relative_common_path_list:
             relative_common_path += path + os.sep
+
+    if relative_common_path.endswith("/"):
+        relative_common_path = remove_suffix(relative_common_path, "/")
     print("read_strings_from_file: encoding = ", encoding, " relative_common_path ", relative_common_path)
 
     with open(file=file_path_a, encoding=encoding) as f:
@@ -130,24 +150,25 @@ def read_strings_from_file(module_name: str, file_path_a: str) -> list:
             ios_string_value = ""
             if str(string_line).__contains__(" = \""):  # "MXCHIP_upgrade_skip" = "暂不升级"; 类型的, 等号两端都有空格
                 ios_string_id = string_line.split(" = \"")[0].replace("\"", "")
-                ios_string_value = string_line.split("\" ")[1] \
-                    .replace("= ", "") \
-                    .replace(";", "") \
-                    .replace("\"", "")
+                ios_string_value = string_line.split("\" ")[1].replace("= ", "")
+
             if ios_string_id == "":
                 if str(string_line).__contains__("\"=\""):  # "MXCHIP_upgrade_skip"="暂不升级"; 类型的 等号两端都没有空格
                     ios_string_id = string_line.split("\"=\"")[0].replace("\"", "")
-                    ios_string_value = string_line.split("\"=\"")[1] \
-                        .replace("= ", "") \
-                        .replace(";", "").replace("\"", "")
+                    ios_string_value = string_line.split("\"=\"")[1].replace("= ", "")
             if ios_string_id == "":
                 if str(string_line).__contains__("\"= \""):  # "MXCHIP_upgrade_skip"= "暂不升级"; 类型的 等号右端有空格, 左侧没有空格的
                     ios_string_id = string_line.split("\"= \"")[0].replace("\"", "")
-                    ios_string_value = string_line.split("\"= \"")[1] \
-                        .replace("= ", "") \
-                        .replace(";", "").replace("\"", "")
-
+                    ios_string_value = string_line.split("\"= \"")[1].replace("= ", "")
             ios_string_value = ios_string_value.strip("\n")
+            if ios_string_value.endswith(";"):
+                ios_string_value = remove_suffix(ios_string_value, ";")
+            if ios_string_value.endswith("\""):
+                ios_string_value = remove_suffix(ios_string_value, "\"")
+            if ios_string_value.startswith("\""):
+                ios_string_value = remove_prefix(ios_string_value, "\"")
+            print("read_strings_from_file: ios_string_value = ", ios_string_value)
+
             if language_dir.__contains__("zh.lproj") or language_dir.__contains__("zh-Hans.lproj"):
                 lang_string = LangString(string_id=ios_string_id, common_path=relative_common_path,
                                          module_name=module_name,
@@ -219,12 +240,11 @@ def divide_string_dict_by_file(string_dict: dict) -> dict:
     :return:
     """
     string_by_file_dict = {}
-    # global zh_cn_lang_file_list
     for mobile_string_id in string_dict.keys():
         mobileString: MobileString = string_dict.get(mobile_string_id)
         if mobileString is None:
             continue
-        print("lang_file_l ist mobileString =", mobileString)
+        print("divide_string_dict_by_file mobileString.english_us =", mobileString.english_us)
         if mobileString.zh_cn is not None and mobileString.zh_cn.get_full_path() != "":
             # try:
             zh_cn_lang_file_list = string_by_file_dict.get(mobileString.zh_cn.get_full_path())
@@ -336,8 +356,7 @@ def merge_lang_to_mobile_string(identity_key_string_list: list) -> MobileString:
     module = identity_key_string_list[0].module_name
     string_id = identity_key_string_list[0].string_id
     mobile_string = MobileString(module_name=module, string_id=string_id,
-                                 is_ios_string=True, is_android_string=False
-                                 )
+                                 is_ios_string=True, is_android_string=False)
     for lang_string in identity_key_string_list:
         if lang_string.lang_dir == "zh.lproj":
             mobile_string.zh_cn = lang_string
@@ -435,7 +454,7 @@ def get_ios_string_dict_by_module() -> dict:
 
 def get_source_text(mobile_string: MobileString) -> str:
     """
-    输入一个 mobilestring 对象, 选择合适的
+    输入一个 mobilestring 对象, 选择合适的文本然后去作为基础文本
     :param mobile_string:
     :return:
     """
@@ -451,6 +470,10 @@ def get_source_text(mobile_string: MobileString) -> str:
         return mobile_string.spanish.content
     elif mobile_string.germany is not None and mobile_string.germany != "":
         return mobile_string.germany.content
+    elif mobile_string.korean is not None and mobile_string.korean != "":
+        return mobile_string.korean.content
+    elif mobile_string.japan is not None and mobile_string.japan != "":
+        return mobile_string.japan.content
 
 
 def get_source_text_file_path(mobile_string: MobileString) -> str:
@@ -530,27 +553,27 @@ def get_pending_translate_ios_string_dict() -> dict:
             print("get_pending_translate_ios_string_dict: source_text = ", source_text)
 
             if target_lang == "ZH-CN":
-                # ios_string.english_us = translate(source_text, "en", "zh-CN")
+                ios_string.english_us.content = translate(source_text, "en", "zh-CN")
                 ios_string.zh_cn_file = common_file_path + os.sep + "zh.lproj" + os.sep + file_name
             if target_lang == "EN-US":
-                # ios_string.english_us = translate(source_text, "en", "zh-CN")
+                ios_string.english_us.content = translate(source_text, "en", "zh-CN")
                 ios_string.english_us_file = common_file_path + os.sep + "en.lproj" + os.sep + file_name
             if target_lang == "JA":
-                # ios_string.japan = translate_text(source_text, "JA", "zh-CN")
+                ios_string.japan.content = translate_text(source_text, "JA", "zh-CN")
                 ios_string.japan_file = common_file_pat_with_sep + "ja.lproj" + os.sep + file_name
             if target_lang == "KO":
-                # ios_string.korean = translate(source_text, "ko", "zh-CN")
+                ios_string.korean.content = translate(source_text, "ko", "zh-CN")
                 ios_string.korean_file = common_file_path + os.sep + "ko.lproj" + os.sep + file_name
-            print("android_string  === ", ios_string)
         string_dict_by_id[string_id] = ios_string
     return string_dict_by_id
 
 
-def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
-    suffix = filePath.split("/")[-1]
-    file_path_dir = filePath.replace(suffix, "")
-    print("=========== filePath ", filePath, ", suffix = ", suffix)
-    print("=========== filePath ", filePath, ", target_language , ", target_language)
+def generate_ios_res(string_dict: dict, target_language: str, file_path: str):
+    file_path = get_project_name() + os.sep + file_path
+
+    suffix = file_path.split("/")[-1]
+    file_path_dir = file_path.replace(suffix, "")
+    print("=========== filePath ", file_path, ", suffix = ", suffix, ", target_language = ", target_language)
     print("=========== file_path_dir ", file_path_dir, ", target_language , ", target_language)
     if os.path.exists(file_path_dir):
         pass
@@ -558,7 +581,7 @@ def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
         os.makedirs(name=file_path_dir)
     print("generate_ios_res: string_line: len(string_dict) = ", len(string_dict))
 
-    with open(filePath, mode="w+") as f:
+    with open(file_path, mode="w+") as f:
         for ios_string_key in string_dict.keys():
             print("generate_ios_res: string_line: ios_string_key = ", ios_string_key)
             if ios_string_key == "":
@@ -581,16 +604,10 @@ def generate_ios_res(string_dict: dict, target_language: str, filePath: str):
             f.write(string_line)
 
 
-if __name__ == '__main__':
-    # get_ios_string_dict_by_identity_key()
-
-    # print("ios_string_dict_by_id = ", ios_string_dict_by_id[ios_string_key])
-    pending_translation_ios_string_dict = get_pending_translate_ios_string_dict()
-    divider_by_file = divide_string_dict_by_file(pending_translation_ios_string_dict)
-    print("=================== len(divider_by_file) = ", len(divider_by_file))
-    for file_key in divider_by_file.keys():
+def generate_ios_string_by_file_key(string_dict_by_file_key: dict):
+    for file_key in string_dict_by_file_key.keys():
         print("================ file_key = ", file_key)
-        string_list = divider_by_file.get(file_key)
+        string_list = string_dict_by_file_key.get(file_key)
 
         string_list_dict = {}
         if string_list is None:
@@ -617,3 +634,13 @@ if __name__ == '__main__':
             if target_lang == "KO":
                 if str(file_key).__contains__("ko.lproj"):
                     generate_ios_res(string_list_dict, "KO", file_key)
+
+
+if __name__ == '__main__':
+    # get_ios_string_dict_by_identity_key()
+
+    # print("ios_string_dict_by_id = ", ios_string_dict_by_id[ios_string_key])
+    pending_translation_ios_string_dict = get_pending_translate_ios_string_dict()
+    divider_by_file = divide_string_dict_by_file(pending_translation_ios_string_dict)
+    print("=================== len(divider_by_file) = ", len(divider_by_file))
+    generate_ios_string_by_file_key(divider_by_file)
