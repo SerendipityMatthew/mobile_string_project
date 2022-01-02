@@ -10,7 +10,7 @@ class MobileString:
 
                  isStringArray=False,
                  is_android_string=False, is_ios_string=False,
-                 default_lang="",
+                 default_lang: LangString = None,
                  zh_tw: LangString = None,
                  spanish: LangString = None,
                  french: LangString = None,
@@ -54,7 +54,9 @@ class MobileString:
         :return:
         """
         mobile_string_identity_key = ""
-        if self.zh_cn is not None and self.zh_cn.get_identity_key() is not None and self.zh_cn.get_identity_key() != "":
+        if self.default_lang is not None and self.default_lang.get_identity_key() is not None and self.default_lang.get_identity_key() != "":
+            mobile_string_identity_key = self.default_lang.get_identity_key()
+        elif self.zh_cn is not None and self.zh_cn.get_identity_key() is not None and self.zh_cn.get_identity_key() != "":
             mobile_string_identity_key = self.zh_cn.get_identity_key()
         elif self.english_us is not None and self.english_us.get_identity_key() is not None and self.english_us.get_identity_key() != "":
             mobile_string_identity_key = self.english_us.get_identity_key()
@@ -72,12 +74,9 @@ class MobileString:
             mobile_string_identity_key = self.french.get_identity_key()
         return mobile_string_identity_key
 
-
-def __str__(self):
-    string = ""
-    for key in self.__dict__.keys():
-        value = self.__dict__[key]
-        if value is None:
-            value = ""
-        string = string + str(key) + ": " + str(value) + "\n"
-    return string
+    def __str__(self):
+        string = ""
+        for key in self.__dict__.keys():
+            value = self.__dict__[key]
+            string = string + str(key) + ":= " + str(value) + "\n"
+        return string

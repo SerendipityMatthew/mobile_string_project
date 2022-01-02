@@ -40,12 +40,13 @@ def translate_by_api(text: str, to_language="auto", text_language="auto"):
     return google_translator.translate(text, dest=to_language).text
 
 
-def translate(text, to_language="auto", source_language="auto"):
+def translate(text, to_language="auto", source_language="auto") -> str:
+    source_language = "auto"
     """
     通过网页的方式翻译字符串， 似乎有请求次数的限制，切换成 api 接口的方式更好
+    :param source_language: 
     :param text:
     :param to_language:
-    :param text_language:
     :return:
     """
     text = parse.quote(text)
@@ -56,16 +57,20 @@ def translate(text, to_language="auto", source_language="auto"):
     result = re.findall(expr, data)
     if len(result) == 0:
         return ""
+    result_text = html.unescape(result[0])
+    print("the translated text is: result_text = ", result_text)
 
-    return html.unescape(result[0])
+    return result_text
 
 
-def translate_text(text: str, dest_lang: str, source_lang: str = ""):
+def translate_text(text: str, dest_lang: str, source_lang: str = "") -> str:
+    result = ''
     if is_translate_by_google():
-        return translate(text, dest_lang)
+        result = translate(text, dest_lang)
     else:
         deepl_trans = get_translation_text_by_deepl(text, target_lang=dest_lang)
-        return deepl_trans
+        result = deepl_trans
+    return result
 
 
 print(get_translation_text_by_deepl("保存", "JA"))

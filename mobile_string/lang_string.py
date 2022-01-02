@@ -25,6 +25,7 @@ class LangString:
         return self.common_path + os.sep + self.lang_dir + os.sep + self.file_name
 
     def get_identity_key(self) -> str:
+        print("==================== self.common_path = ", self.common_path)
         """
         该字符串的独特 id, 是由 common_path 和 string_id 组成的字符串,
         拥有此 identity_key 的字符串将会被合并到一个共同 mobile_string, 组成一个全语言系列的字符串
