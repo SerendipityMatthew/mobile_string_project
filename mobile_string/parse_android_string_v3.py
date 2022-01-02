@@ -588,42 +588,6 @@ def generate_android_res(string_value_dict: dict, target_language: str, save_str
     pretty_xml_to_file(save_str_file_path, "./")
 
 
-def generate_ios_res(string_dict: dict, target_language: str, file_path: str):
-    file_path = get_project_name() + os.sep + file_path
-
-    suffix = file_path.split("/")[-1]
-    file_path_dir = file_path.replace(suffix, "")
-    print("=========== filePath ", file_path, ", suffix = ", suffix, ", target_language = ", target_language)
-    print("=========== file_path_dir ", file_path_dir, ", target_language , ", target_language)
-    if os.path.exists(file_path_dir):
-        pass
-    else:
-        os.makedirs(name=file_path_dir)
-    print("generate_ios_res: string_line: len(string_dict) = ", len(string_dict))
-
-    with open(file_path, mode="w+") as f:
-        for ios_string_key in string_dict.keys():
-            print("generate_ios_res: string_line: ios_string_key = ", ios_string_key)
-            if ios_string_key == "":
-                continue
-            string_value = string_dict[ios_string_key]
-            print("generate_ios_res: string_line: target_language = ", target_language)
-
-            if target_language == "JA":
-                string_value_str = str(string_value.japan.content)
-            if target_language == "EN-US":
-                string_value_str = str(string_value.english_us.content)
-            if target_language == "ZH-CN":
-                string_value_str = str(string_value.zh_cn.content)
-            if target_language == "KO":
-                string_value_str = str(string_value.korean.content)
-            if string_value_str == "":
-                continue
-            string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + string_value_str + "\";\n"
-            print("generate_ios_res: string_line: string_line = ", string_line)
-            f.write(string_line)
-
-
 def generate_ios_string_by_file_key(string_dict_by_file_key: dict):
     for file_key in string_dict_by_file_key.keys():
         print("================ file_key = ", file_key)
