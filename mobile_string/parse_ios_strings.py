@@ -1,3 +1,4 @@
+import copy
 import os
 
 import chardet
@@ -235,82 +236,69 @@ def read_strings_from_file(module_name: str, file_path_a: str) -> list:
 
 def divide_string_dict_by_file(string_dict: dict) -> dict:
     """
-    将 android 的字符串 按照所要写的路径, 重新划分一下, 这样就可以一次性写一个文件
+    将 android 的字符串 按照所要写的路径, 重新划分一下, 这样就可以一次性写一个文件, 返回的字符串 都是 LangString 类型的
     :param string_dict:
     :return:
     """
     string_by_file_dict = {}
+    target_lang_list = get_target_languages()
     for mobile_string_id in string_dict.keys():
         mobileString: MobileString = string_dict.get(mobile_string_id)
         if mobileString is None:
             continue
-        print("divide_string_dict_by_file mobileString.english_us =", mobileString.english_us)
-        if mobileString.zh_cn is not None and mobileString.zh_cn.get_full_path() != "":
-            # try:
-            zh_cn_lang_file_list = string_by_file_dict.get(mobileString.zh_cn.get_full_path())
-            # except KeyError:
-            #     zh_cn_lang_file_list = []
-            if zh_cn_lang_file_list is None:
-                zh_cn_lang_file_list = []
-
-            zh_cn_lang_file_list.append(mobileString)
-            string_by_file_dict[mobileString.zh_cn.get_full_path()] = zh_cn_lang_file_list
-            # lang_file_list.clear()
-
-        if mobileString.english_us is not None and mobileString.english_us.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.english_us.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            lang_file_list.append(mobileString)
-            string_by_file_dict[mobileString.english_us.get_full_path()] = lang_file_list
-            # lang_file_list.clear()
-
-        if mobileString.spanish is not None and mobileString.spanish.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.spanish.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            lang_file_list.append(mobileString)
-            string_by_file_dict[mobileString.spanish.get_full_path()] = lang_file_list
-            # lang_file_list.clear()
-
-        if mobileString.french is not None and mobileString.french.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.french.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            lang_file_list.append(mobileString)
-            string_by_file_dict[mobileString.french.get_full_path()] = lang_file_list
-            # lang_file_list.clear()
-
-        if mobileString.russia is not None and mobileString.russia.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.russia.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            string_by_file_dict[mobileString.russia.get_full_path()] = lang_file_list.append(mobileString)
-            # lang_file_list.clear()
-
-        if mobileString.germany is not None and mobileString.germany.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.germany.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            string_by_file_dict[mobileString.germany.get_full_path()] = lang_file_list.append(mobileString)
-            # lang_file_list.clear()
-
-        if mobileString.korean is not None and mobileString.korean.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.korean.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            lang_file_list.append(mobileString)
-            string_by_file_dict[mobileString.korean.get_full_path()] = lang_file_list
-            # lang_file_list.clear()
-
-        if mobileString.japan is not None and mobileString.japan.get_full_path() != "":
-            lang_file_list = string_by_file_dict.get(mobileString.japan.get_full_path())
-            if lang_file_list is None:
-                lang_file_list = []
-            lang_file_list.append(mobileString)
-            string_by_file_dict[mobileString.japan.get_full_path()] = lang_file_list
-            # lang_file_list.clear()
+        print("divide_string_dict_by_file mobileString = ", mobileString)
+        for target_lang in target_lang_list:
+            if target_lang == "KO":
+                if mobileString.korean is not None and mobileString.korean.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.korean.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.korean)
+                    string_by_file_dict[mobileString.korean.get_full_path()] = lang_file_list
+            if target_lang == "JA":
+                if mobileString.japan is not None and mobileString.japan.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.japan.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.japan)
+                    string_by_file_dict[mobileString.japan.get_full_path()] = lang_file_list
+            if target_lang == "EN-US":
+                if mobileString.english_us is not None and mobileString.english_us.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.english_us.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.english_us)
+                    string_by_file_dict[mobileString.english_us.get_full_path()] = lang_file_list
+            if target_lang == "DE":
+                if mobileString.germany is not None and mobileString.germany.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.germany.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.germany)
+                    string_by_file_dict[mobileString.germany.get_full_path()] = lang_file_list
+            if target_lang == "ES":
+                if mobileString.spanish is not None and mobileString.spanish.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.spanish.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.spanish)
+                    string_by_file_dict[mobileString.spanish.get_full_path()] = lang_file_list
+            if target_lang == "FR":
+                if mobileString.french is not None and mobileString.french.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.french.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.french)
+                    string_by_file_dict[mobileString.french.get_full_path()] = lang_file_list
+            if target_lang == "RU":
+                if mobileString.russia is not None and mobileString.russia.get_full_path() != "":
+                    lang_file_list = string_by_file_dict.get(mobileString.russia.get_full_path())
+                    if lang_file_list is None:
+                        lang_file_list = []
+                    lang_file_list.append(mobileString.russia)
+                    string_by_file_dict[mobileString.russia.get_full_path()] = lang_file_list
     return string_by_file_dict
+
 
 
 def get_raw_ios_string_dict() -> dict:
@@ -533,8 +521,52 @@ def get_string_file_name(mobile_string: MobileString) -> str:
     return file_name
 
 
+def borrow_lang_string(mobile_string: MobileString, target_lang: str) -> LangString:
+    """
+     如果目标语言没有改字符串, 那么我们从别的语言借一个过来
+    :param mobile_string:
+    :param target_lang:
+    :return:
+    """
+    target_lang_str = LangString()
+    if mobile_string.default_lang is not None:
+        target_lang_str = mobile_string.default_lang
+    elif mobile_string.zh_cn is not None:
+        target_lang_str = mobile_string.zh_cn
+    elif mobile_string.zh_tw is not None:
+        target_lang_str = mobile_string.zh_tw
+    elif mobile_string.english_us is not None:
+        target_lang_str = mobile_string.english_us
+    elif mobile_string.germany is not None:
+        target_lang_str = mobile_string.germany
+    elif mobile_string.french is not None:
+        target_lang_str = mobile_string.french
+    elif mobile_string.japan is not None:
+        target_lang_str = mobile_string.japan
+    elif mobile_string.korean is not None:
+        target_lang_str = mobile_string.korean
+    elif mobile_string.russia is not None:
+        target_lang_str = mobile_string.russia
+    elif mobile_string.spanish is not None:
+        target_lang_str = mobile_string.spanish
+
+    if target_lang_str is None:
+        raise (Exception("there is no other language string you can borrow"))
+
+    target_lang_str.lang_dir = target_lang
+    print("============= target_lang_str = ", target_lang_str, ", target_lang = ", target_lang)
+
+    return target_lang_str
+
+
 def get_pending_translate_ios_string_dict() -> dict:
+    """
+
+    :return: 返回的是所有的已经翻译过的字符串
+    """
     string_dict_by_id = get_ios_string_dict_by_identity_key()
+    target_lang_list = get_target_languages()
+    translated_string_dict = {}
     for string_id in string_dict_by_id.keys():
         ios_string: MobileString = string_dict_by_id[string_id]
         print("get_pending_translate_ios_string_dict(), android_string = ", str(ios_string))
@@ -542,30 +574,44 @@ def get_pending_translate_ios_string_dict() -> dict:
             continue
         if ios_string.string_id is None or ios_string.string_id == "":
             continue
-        for target_lang in get_target_languages():
-            common_file_path = get_common_string_file_path(ios_string)
-            print("get_pending_translate_ios_string_dict: common_file_path = ", common_file_path)
-            common_file_pat_with_sep = common_file_path + os.sep
-            if common_file_path == "":
-                common_file_pat_with_sep = ""
-            file_name = get_string_file_name(ios_string)
-            source_text = get_source_text(ios_string)
-            print("get_pending_translate_ios_string_dict: source_text = ", source_text)
+        source_text = get_source_text(ios_string)
+        print("get_pending_translate_ios_string_dict: ios_string = ", ios_string)
 
+        for target_lang in target_lang_list:
             if target_lang == "ZH-CN":
-                ios_string.english_us.content = translate(source_text, "en", "zh-CN")
-                ios_string.zh_cn_file = common_file_path + os.sep + "zh.lproj" + os.sep + file_name
+                pass
             if target_lang == "EN-US":
+                if ios_string.english_us is None:
+                    """
+                    深度 copy 这个对象, 否则始终使用的都是最后的一个对象, 正确的语言对应不上正确的字符串
+                    """
+                    ios_string.english_us = copy.deepcopy(borrow_lang_string(ios_string, "en.lproj"))
                 ios_string.english_us.content = translate(source_text, "en", "zh-CN")
-                ios_string.english_us_file = common_file_path + os.sep + "en.lproj" + os.sep + file_name
+                print("=============== ios_string.english_us = ", ios_string.english_us)
+
             if target_lang == "JA":
-                ios_string.japan.content = translate_text(source_text, "JA", "zh-CN")
-                ios_string.japan_file = common_file_pat_with_sep + "ja.lproj" + os.sep + file_name
+                if ios_string.japan is None:
+                    ios_string.japan = copy.deepcopy(borrow_lang_string(ios_string, "jp.lproj"))
+                ios_string.japan.content = translate_text(source_text, "ja", "zh-CN")
             if target_lang == "KO":
+                if ios_string.korean is None:
+                    ios_string.korean = copy.deepcopy(borrow_lang_string(ios_string, "ko.lpoj"))
                 ios_string.korean.content = translate(source_text, "ko", "zh-CN")
-                ios_string.korean_file = common_file_path + os.sep + "ko.lproj" + os.sep + file_name
-        string_dict_by_id[string_id] = ios_string
-    return string_dict_by_id
+            if target_lang == "DE":
+                if ios_string.germany is None:
+                    ios_string.germany = copy.deepcopy(borrow_lang_string(ios_string, "de.lproj"))
+                ios_string.germany.content = translate(source_text, "de", "zh-CN")
+            if target_lang == "FR":
+                if ios_string.french is None:
+                    ios_string.french = copy.deepcopy(borrow_lang_string(ios_string, "fr.lproj"))
+                ios_string.french.content = translate(source_text, "fr", "zh-CN")
+            if target_lang == "ES":
+                if ios_string.spanish is None:
+                    ios_string.spanish = copy.deepcopy(borrow_lang_string(ios_string, "es.lproj"))
+                ios_string.spanish.content = translate(source_text, "es", "zh-CN")
+        translated_string_dict[string_id] = ios_string
+
+    return translated_string_dict
 
 
 def generate_ios_res(string_dict: dict, target_language: str, file_path: str):
@@ -588,15 +634,7 @@ def generate_ios_res(string_dict: dict, target_language: str, file_path: str):
                 continue
             string_value = string_dict[ios_string_key]
             print("generate_ios_res: string_line: target_language = ", target_language)
-
-            if target_language == "JA":
-                string_value_str = str(string_value.japan.content)
-            if target_language == "EN-US":
-                string_value_str = str(string_value.english_us.content)
-            if target_language == "ZH-CN":
-                string_value_str = str(string_value.zh_cn.content)
-            if target_language == "KO":
-                string_value_str = str(string_value.korean.content)
+            string_value_str = str(string_value.content)
             if string_value_str == "":
                 continue
             string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + string_value_str + "\";\n"
@@ -622,18 +660,7 @@ def generate_ios_string_by_file_key(string_dict_by_file_key: dict):
         for string in string_list:
             string_list_dict[string.string_id] = string
         for target_lang in get_target_languages():
-            if target_lang == "ZH-CN":
-                if str(file_key).__contains__("zh.lproj"):
-                    generate_ios_res(string_list_dict, "ZH-CN", file_key)
-            if target_lang == "EN-US":
-                if str(file_key).__contains__("en.lproj"):
-                    generate_ios_res(string_list_dict, "EN-US", file_key)
-            if target_lang == "JA":
-                if str(file_key).__contains__("ja.lproj"):
-                    generate_ios_res(string_list_dict, "JA", file_key)
-            if target_lang == "KO":
-                if str(file_key).__contains__("ko.lproj"):
-                    generate_ios_res(string_list_dict, "KO", file_key)
+            generate_ios_res(string_list_dict, target_lang, file_key)
 
 
 if __name__ == '__main__':
