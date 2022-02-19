@@ -86,9 +86,11 @@ def generate_excel_file(string_dict: dict):
     for string_key in string_dict.keys():
         single_module_name_list = string_dict[string_key]
         print("key  = " + string_key + ", the length: " + str(single_module_name_list.__len__()))
+        """
         # 写入一个模块的资源
         # Column1    Column2             (Column3)                    (Column14)
         # 中文字符串   目标语言列      (android module-android id)      (ios module - ios id)
+        """
         sheet.write(index, 0, string_key)
         sheet.write(index, 1, )
         module_and_string_id = ""
