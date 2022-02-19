@@ -16,11 +16,12 @@ from read_ini_utils import is_translate_by_google
 
 GOOGLE_TRANSLATE_URL = 'http://translate.google.cn/m?q=%s&tl=%s&sl=%s'
 
-auth_key = ""
-deepl_translator = deepl.Translator(auth_key)
+auth_key = "xxxxxx"
 
 
 def get_translation_text_by_deepl(text: str, target_lang: str):
+    deepl_translator = deepl.Translator(auth_key)
+
     result = deepl_translator.translate_text(text, target_lang=target_lang)
     translated_text = result.text
     print("the translated text is: ", translated_text)
@@ -73,4 +74,4 @@ def translate_text(text: str, dest_lang: str, source_lang: str = "") -> str:
     return result
 
 
-print(get_translation_text_by_deepl("保存", "JA"))
+# print(get_translation_text_by_deepl("保存", "JA"))

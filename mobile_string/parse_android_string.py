@@ -145,8 +145,8 @@ def read_strings_from_file(module_name: str, file_path):
             string_name_value = child.text
             if string_name_value is None:
                 string_name_value = ""
-            print("read_strings_from_file: string_name_id = ", string_name_id, ", string_name_value = ",
-                  str(string_name_value))
+            # print("read_strings_from_file: string_name_id = ", string_name_id, ", string_name_value = ",
+            #       str(string_name_value))
 
             lang_string = LangString(string_id=string_name_id, common_path=common_path,
                                      module_name=module_name, lang_dir=language_dir,
@@ -272,7 +272,7 @@ def merge_lang_to_mobile_string(identity_key_string_list: list) -> MobileString:
     module = identity_key_string_list[0].module_name
     string_id = identity_key_string_list[0].string_id
     mobile_string = MobileString(module_name=module, string_id=string_id,
-                                 is_ios_string=True, is_android_string=False)
+                                 is_ios_string=False, is_android_string=True)
     for lang_string in identity_key_string_list:
 
         if lang_string.lang_dir == "values":
@@ -302,7 +302,7 @@ def merge_lang_to_mobile_string(identity_key_string_list: list) -> MobileString:
     return mobile_string
 
 
-def get_ios_string_dict_by_identity_key() -> dict:
+def get_android_string_dict_by_identity_key() -> dict:
     """
     把字符串按照 identity_key 划分
     :return:
@@ -311,8 +311,8 @@ def get_ios_string_dict_by_identity_key() -> dict:
     module_strings_dict = get_ios_string_dict_by_module()
     for module_name in module_strings_dict.keys():
         module_strings_list = module_strings_dict.get(module_name)
-        print("=========== module_strings_list = ", len(module_strings_list))
         for ios_string in module_strings_list:
+            print("=========== module_strings_list, ios_string = ", ios_string)
             string_dict_by_identity_key[ios_string.get_identity_key()] = ios_string
     print("=========== string_dict_by_identity_key = ", len(string_dict_by_identity_key))
 
@@ -348,8 +348,8 @@ def get_ios_string_dict_by_module() -> dict:
         if module_string_list is None:
             module_string_list = []
         single_module_raw_string_list = raw_string_dic.get(module_name)
-        print("get_ios_string_dict_by_module, module = ", module_name, "len(single_module_raw_string_list) = ",
-              len(single_module_raw_string_list))
+        # print("get_ios_string_dict_by_module, module = ", module_name, "len(single_module_raw_string_list) = ",
+        #       len(single_module_raw_string_list))
         module_string_dict_by_identity_key = {}
         for lang_string in single_module_raw_string_list:
             string_identity_key = lang_string.get_identity_key()
@@ -369,11 +369,11 @@ def get_ios_string_dict_by_module() -> dict:
             module_string_dict[module_name] = module_string_list
 
     print("the all module string ", len(module_string_dict))
-    for module_name in module_string_dict:
-        module_string_list_a = module_string_dict[module_name]
-        for mobile_string in module_string_list_a:
-            # pass
-            print("==================== mobile_string = ", mobile_string)
+    # for module_name in module_string_dict:
+    #     module_string_list_a = module_string_dict[module_name]
+    #     for mobile_string in module_string_list_a:
+    # pass
+    # print("==================== mobile_string = ", mobile_string)
     return module_string_dict
 
 
