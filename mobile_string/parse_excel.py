@@ -205,7 +205,8 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
 
         for language_key, str_dict in all_language_dict.items():
             android_dir = str(get_language_dir_list(language_key)[0]).replace("\n", "").strip()
-
+            if len(str_dict) == 0:
+                continue
             for stringA in str_dict.keys():
                 value = str_dict[stringA]
                 if value != "":

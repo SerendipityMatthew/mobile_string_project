@@ -65,6 +65,15 @@ def is_number(s):
 
 
 def generate_android_res(string_value_dict: dict, file_path: str, file_name: str):
+    is_not_empty = False
+    for value in string_value_dict.values():
+        if value is not "":
+            is_not_empty = True
+    """
+    如果 这个 map 里面的 每一个 key 对应的 value 都是空的, 那么就表示不需要写这个语言的文件。
+    """
+    if not is_not_empty:
+        return
     """
     将 android 的字符串 写成 android的 strings.xml 的格式
     """
@@ -73,6 +82,8 @@ def generate_android_res(string_value_dict: dict, file_path: str, file_name: str
     root = Element('resources')
     # 生成第一个子节点 head]
     print("string_value_dict = " + str(string_value_dict))
+    print("len(string_value_dict) = ", len(string_value_dict))
+
     for name_key in string_value_dict:
         string_value = string_value_dict[name_key]
         # print("string_value = " + string_value)
