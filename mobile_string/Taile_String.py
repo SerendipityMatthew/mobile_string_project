@@ -5,7 +5,7 @@ class TaileString:
                  android_id="", function_desc="",
                  default_lang="", ios_id="",
                  spanish="", french="", russia="",
-                 korean="", japan="", germany=""):
+                 korean="", japan="", germany="", **languages):
         self.module_name = module_name
         self.ios_module = ios_module
         self.android_src_path = android_src_path
@@ -23,6 +23,7 @@ class TaileString:
         self.russia = russia
         self.korean = korean
         self.japan = japan
+        self.__dict__.update(languages)
 
     def __str__(self):
         string = ""

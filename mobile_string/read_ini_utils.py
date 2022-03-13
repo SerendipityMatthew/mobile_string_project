@@ -49,6 +49,33 @@ def is_translate_by_deepl() -> bool:
     return translation_api == "deepl"
 
 
+def get_language_key_list() -> list:
+    return config.options("language")
+
+
+def get_language_chinese_title_key_list() -> list:
+    return config.options("language-chinese-title")
+
+
+def get_chinese_title(language_key: str) -> str:
+    return config.get('language-chinese-title', language_key).strip("\n").strip()
+
+
+def get_chinese_title_list() -> list:
+    chinese_title_list = list()
+    for language_key in get_language_chinese_title_key_list():
+        chinese_title = config.get('language-chinese-title', language_key).strip("\n").strip()
+        chinese_title_list.append(chinese_title)
+    return chinese_title_list
+
+
+def get_language_dir_list(language_key: str) -> list:
+    return config.get('language', language_key).strip("\n").strip().split(",")
+
+
 if __name__ == "__main__":
-    print("get_android_strings_files() ", get_android_strings_files())
-    print("get_ios_strings_files() ", get_ios_strings_files())
+    # print("get_android_strings_files() ", get_android_strings_files())
+    # print("get_ios_strings_files() ", get_ios_strings_files())
+    # print(get_language_key_list())
+    for key in get_language_key_list():
+        print(get_language_dir_list(key))
