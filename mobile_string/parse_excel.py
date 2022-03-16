@@ -275,27 +275,19 @@ def generate_string_file(string_list: list):
     string_type_list = get_parse_string_type()
 
     for string_type in string_type_list:
+        mobile_string_list = get_mobile_string_by_type(string_list, str(string_type))
+        print("generate_string_file: string_type = %s, the all size is %d" % (string_type, len(string_list)))
+
+        module_name_list = []
+        for mobile_string in mobile_string_list:
+            module_name_list.append(mobile_string.module_name)
+        module_list = list(set(module_name_list))
         if str(string_type) == "android":
-            android_string_list = get_mobile_string_by_type(string_list, str(string_type))
-            android_module_name_list = []
-            for android_string in android_string_list:
-                android_module_name_list.append(android_string.module_name)
-
-            print("=============== android_string_list.size = ", len(android_string_list))
-            module_list = list(set(android_module_name_list))
             for module_name_A in module_list:
-                generate_module_string_to_xml(module_name_A, android_string_list, )
-        if str(string_type).lower() == "ios":
-            ios_string_list = get_mobile_string_by_type(string_list, str(string_type))
-            ios_module_name_list = []
-
-            for ios_string in ios_string_list:
-                ios_module_name_list.append(ios_string.module_name)
-            module_list = list(set(ios_module_name_list))
-            print("=============== module_list.size = ", len(module_list))
-
+                generate_module_string_to_xml(module_name_A, mobile_string_list, )
+        elif str(string_type) == "ios":
             for module_name_A in module_list:
-                generate_module_string_to_ios_file(module_name_A, ios_string_list, )
+                generate_module_string_to_ios_file(module_name_A, mobile_string_list)
 
 
 if __name__ == "__main__":
