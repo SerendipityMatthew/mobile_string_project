@@ -203,7 +203,11 @@ def generate_module_string_to_ios_file(module_name, module_string_list, xml_file
             print("============ page_start_string  = ", taile_string)
             if taile_string.module_name == module_name:
                 # 获取需要需要的属性对应的语言字符串
-                string_dict[taile_string.ios_id] = getattr(taile_string, language_key)
+                try:
+                    string_dict[taile_string.ios_id] = getattr(taile_string, language_key)
+                except AttributeError:
+                    print("there is no attribute %s for object %s = " % (language_key, taile_string))
+
         all_language_dict[language_key] = string_dict
 
     if len(all_language_dict) != 0:
@@ -244,7 +248,10 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
             print("============ page_start_string  = ", taile_string)
             if taile_string.module_name == module_name:
                 # 获取需要需要的属性对应的语言字符串
-                string_dict[taile_string.android_id] = getattr(taile_string, language_key)
+                try:
+                    string_dict[taile_string.android_id] = getattr(taile_string, language_key)
+                except AttributeError:
+                    print("there is no attribute %s for object %s = " % (language_key, taile_string))
         all_language_dict[language_key] = string_dict
 
     if len(all_language_dict) != 0:
