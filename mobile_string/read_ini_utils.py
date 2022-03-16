@@ -22,6 +22,10 @@ def get_ios_strings_files() -> list:
     return get_common_string_files("ios_strings_files")
 
 
+def get_parse_string_type() -> list:
+    return get_common_string_files("parse_string_type")
+
+
 def get_ios_project_path() -> str:
     return config.get('project', 'ios_project_path').strip("\n")
 

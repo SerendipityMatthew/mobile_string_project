@@ -4,7 +4,7 @@ import pandas
 
 from Taile_String import TaileString
 from read_ini_utils import get_language_key_list, get_language_dir_list, get_chinese_title_list, \
-    get_language_chinese_title_key_list, get_chinese_title
+    get_language_chinese_title_key_list, get_chinese_title, get_parse_string_type
 from xml_utils import generate_android_res
 from ios_string import IOS_String
 
@@ -33,6 +33,7 @@ def parse_excel_file():
         english_us = ""
 
         language_map = dict()
+        #  我要遍历一行的每个列里的数据,
         for column in columns:
             column_value = row[column]
             column_title = str(column)
@@ -60,35 +61,66 @@ def parse_excel_file():
                             language_map[language_key] = column_value
 
         trimmed_android_id = str(android_id_str).strip().replace("\n", "")
-        if trimmed_android_id != "":
-            trimmed_android_id_list = trimmed_android_id.split("&")
-            for android_module_res_id_item in trimmed_android_id_list:
-                if android_module_res_id_item == "":
-                    continue
-                print("-------------  android_module_res_id_item = ", android_module_res_id_item)
-                android_module = android_module_res_id_item.split("#")[0]
-                android_id = android_module_res_id_item.split("#")[1]
-                taileString = TaileString(android_module, android_id=android_id,
-                                          simplified_chinese=chinese_simple_str,
-                                          default_lang=default_lang_str,
-                                          english_us=english_us,
-                                          )
-                taileString.__dict__.update(language_map)
-                list.append(taileString)
-
         trimmed_ios_id = str(ios_id_str).strip().replace("\n", "")
+        string_type_list = get_parse_string_type()
+        for string_type in string_type_list:
+            trimmed_id_list = []
+            string_type_str = str(string_type).lower()
+            if string_type_str == "android":
+                trimmed_id_list = trimmed_android_id.split("&")
+            elif string_type_str == "ios":
+                trimmed_id_list = trimmed_ios_id.split("&")
 
-        if trimmed_ios_id != "":
-            trimmed_ios_id_list = trimmed_ios_id.split("&")
-            for module_res_id_item in trimmed_ios_id_list:
+            print("trimmed_id_list = ")
+            if len(trimmed_id_list) == 0:
+                break
+
+            for module_res_id_item in trimmed_id_list:
                 if module_res_id_item == "":
                     continue
-                print("-------------  hello = ", module_res_id_item)
-                module_name = module_res_id_item.split("#")[0]
-                ios_id = module_res_id_item.split("#")[1]
-                ios_string = IOS_String(value=english_us, string_id=ios_id, module_name=module_name, file_name="",
-                                        chinese_simple_str=chinese_simple_str)
-                list.append(ios_string)
+                print("------------- string_type_str = %s module_res_id_item = %s " % (
+                    string_type_str, module_res_id_item))
+                module_id_group = module_res_id_item.split("#")
+                taileString: TaileString
+                if len(module_id_group) == 1:
+                    string_id = module_id_group[0]
+                    if string_type_str == "android":
+                        taileString = TaileString("android_app", android_id=string_id,
+                                                  simplified_chinese=chinese_simple_str,
+                                                  default_lang=default_lang_str,
+                                                  english_us=english_us,
+                                                  )
+                        taileString.__dict__.update(language_map)
+                        list.append(taileString)
+                    elif string_type_str == "ios":
+                        taileString = TaileString("ios_app", ios_id=string_id,
+                                                  simplified_chinese=chinese_simple_str,
+                                                  default_lang=default_lang_str,
+                                                  english_us=english_us,
+                                                  )
+                        taileString.__dict__.update(language_map)
+                        list.append(taileString)
+                elif len(module_id_group) == 2:
+
+                    string_module = module_id_group[0]
+                    string_id = module_id_group[1]
+                    if string_type_str == "android":
+                        taileString = TaileString(string_module, android_id=string_id,
+                                                  simplified_chinese=chinese_simple_str,
+                                                  default_lang=default_lang_str,
+                                                  english_us=english_us,
+                                                  )
+                        taileString.__dict__.update(language_map)
+                        list.append(taileString)
+                    elif string_type_str == "ios":
+                        taileString = TaileString(string_module, ios_id=string_id,
+                                                  simplified_chinese=chinese_simple_str,
+                                                  default_lang=default_lang_str,
+                                                  english_us=english_us,
+                                                  )
+                        taileString.__dict__.update(language_map)
+                        list.append(taileString)
+
     return list
 
 
@@ -107,35 +139,40 @@ def get_module_string(module_name: str, string_list: list):
     return single_module_list
 
 
-def get_android_string(string_list: list) -> list:
+def get_mobile_string_by_type(string_list: list, string_type: str) -> list:
     """
     获取 android 的字符串
+    :param string_type:
     :param string_list:
     :return:
     """
-    temp_module_name_list = []
-    for string in string_list:
-        if type(string) is TaileString:
-            temp_module_name_list.append(string)
-    module_name_list_a = list(set(temp_module_name_list))
-    return module_name_list_a
+    print("module_name_list_a = len(string_list) = ", len(string_list))
+    print("module_name_list_a = string_type = ", string_type)
 
-
-def get_ios_string(string_list: list) -> list:
-    """
-    获取 ios 的字符串
-    :param string_list:
-    :return:
-    """
     temp_module_name_list = []
-    for string in string_list:
-        if type(string) is IOS_String:
-            temp_module_name_list.append(string)
+    if str(string_type) == "android":
+        for string in string_list:
+            if str(string.android_id) != "":
+                temp_module_name_list.append(string)
+    elif str(string_type) == "ios":
+        for string in string_list:
+            if str(string.ios_id) != "":
+                temp_module_name_list.append(string)
     module_name_list_a = list(set(temp_module_name_list))
+    print("module_name_list_a = len(module_name_list_a) = ", len(module_name_list_a))
     return module_name_list_a
 
 
 def generate_ios_res(string_dict: dict, filePath: str, file_name: str):
+    is_not_empty = False
+    for value in string_dict.values():
+        if value is not "":
+            is_not_empty = True
+    """
+    如果 这个 map 里面的 每一个 key 对应的 value 都是空的, 那么就表示不需要写这个语言的文件。
+    """
+    if not is_not_empty:
+        return
     if not os.path.exists(filePath):
         os.makedirs(filePath)
     with open(filePath + file_name, mode="w+") as f:
@@ -145,36 +182,46 @@ def generate_ios_res(string_dict: dict, filePath: str, file_name: str):
             ios_string = string_dict[ios_string_key]
             if ios_string == "":
                 continue
+            print("ios_string_key = ", ios_string_key)
+            #  去掉左右两边的引号
+            ios_string_key = str(ios_string_key).replace("\"", "")
+
             string_line = "\"" + ios_string_key + "\"" + " = " + "\"" + ios_string + "\";\n"
             f.write(string_line)
 
 
 def generate_module_string_to_ios_file(module_name, module_string_list, xml_file_name="Localizable.strings"):
     module_name_path = "./ios_app/" + module_name
-    string_dict = {}
 
-    #  获取简体中文的字符串
-    for taile_string in module_string_list:
-        print("============ page_start_string  = ", taile_string)
-        if taile_string.module_name == module_name:
-            # 获取需要需要的属性
-            lang_key_list = get_language_key_list()
-            for language_key in lang_key_list:
-                string_dict[taile_string.string_id] = getattr(taile_string, language_key)
-    print(" simplified_chinese_dict = " + str(len(string_dict)))
-    if len(string_dict) != 0:
+    lang_key_list = get_language_key_list()
+
+    all_language_dict = {}
+    # 遍历所需要的语言列表
+    for language_key in lang_key_list:
+        string_dict = {}
+        for taile_string in module_string_list:
+            print("============ page_start_string  = ", taile_string)
+            if taile_string.module_name == module_name:
+                # 获取需要需要的属性对应的语言字符串
+                string_dict[taile_string.ios_id] = getattr(taile_string, language_key)
+        all_language_dict[language_key] = string_dict
+
+    if len(all_language_dict) != 0:
         trimmed_string_dict = {}
-        for stringA in string_dict.keys():
-            value = string_dict[stringA]
-            if value != "":
-                trimmed_string_dict[stringA] = value
-            print("--------------- string_dict[stringA] ", )
-        if len(trimmed_string_dict) != 0:
-            generate_ios_res(string_dict,
-                             module_name_path + "/" + "zh.proj" + "/",
-                             file_name=xml_file_name)
 
-    string_dict.clear()
+        for language_key, str_dict in all_language_dict.items():
+            # 1 表示 iOS 的路径， 0 表示 Android 的路径
+            ios_dir = str(get_language_dir_list(language_key)[1]).replace("\n", "").strip()
+            if len(str_dict) == 0:
+                continue
+            for stringA in str_dict.keys():
+                value = str_dict[stringA]
+                if value != "":
+                    trimmed_string_dict[stringA] = value
+                print("--------------- string_dict[stringA] ", )
+            if len(trimmed_string_dict) != 0:
+                generate_ios_res(str_dict, module_name_path + "/" + ios_dir + "/",
+                                 file_name=xml_file_name)
 
 
 def generate_module_string_to_xml(module_name, module_string_list, xml_file_name="strings.xml"):
@@ -186,7 +233,7 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
     :return:
     """
     module_name_path = "./android_app/" + module_name
-
+    print("generate_module_string_to_xml: module_name_path = ", module_name_path)
     lang_key_list = get_language_key_list()
 
     all_language_dict = {}
@@ -217,22 +264,33 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
                                      file_name=xml_file_name)
 
 
+def generate_string_file(string_list: list):
+    string_type_list = get_parse_string_type()
+
+    for string_type in string_type_list:
+        if str(string_type) == "android":
+            android_string_list = get_mobile_string_by_type(string_list, str(string_type))
+            android_module_name_list = []
+            for android_string in android_string_list:
+                android_module_name_list.append(android_string.module_name)
+
+            print("=============== android_string_list.size = ", len(android_string_list))
+            module_list = list(set(android_module_name_list))
+            for module_name_A in module_list:
+                generate_module_string_to_xml(module_name_A, android_string_list, )
+        if str(string_type).lower() == "ios":
+            ios_string_list = get_mobile_string_by_type(string_list, str(string_type))
+            ios_module_name_list = []
+
+            for ios_string in ios_string_list:
+                ios_module_name_list.append(ios_string.module_name)
+            module_list = list(set(ios_module_name_list))
+            print("=============== module_list.size = ", len(module_list))
+
+            for module_name_A in module_list:
+                generate_module_string_to_ios_file(module_name_A, ios_string_list, )
+
+
 if __name__ == "__main__":
     all_string_list = parse_excel_file()
-
-    android_string_list = get_android_string(all_string_list)
-    android_module_name_list = []
-    for android_string in android_string_list:
-        android_module_name_list.append(android_string.module_name)
-
-    print("=============== android_string_list.size = ", len(android_string_list))
-    module_list = list(set(android_module_name_list))
-    for module_name_A in module_list:
-        generate_module_string_to_xml(module_name_A, android_string_list, )
-    # ios_string_list = get_ios_string(all_string_list)
-    # ios_module_name_list = []
-    # for ios_string in ios_string_list:
-    #     ios_module_name_list.append(ios_string.module_name)
-    # module_list = list(set(ios_module_name_list))
-    # for module_name_A in module_list:
-    #     generate_module_string_to_ios_file(module_name_A, ios_string_list, )
+    generate_string_file(all_string_list)
