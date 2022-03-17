@@ -1,8 +1,9 @@
 class TaileString:
     def __init__(self, module_name: str,
-                 simplified_chinese: str, english_us="",
+                 simplified_chinese: str, string_type=str,
+                 english_us="",
                  page_start="", isStringArray=False, android_src_path="", ios_module="",
-                 android_id="", function_desc="",
+                 string_id="", function_desc="",
                  default_lang="", ios_id="",
                  spanish="", french="", russia="",
                  korean="", japan="", germany="", **languages):
@@ -12,8 +13,9 @@ class TaileString:
         self.page_start = page_start
         self.function_desc = function_desc
         self.isStringArray = isStringArray
-        self.android_id = android_id
-        self.ios_id = ios_id
+        self.string_id = string_id
+        #  字符串的类型，Android，或者是 iOS 字符串，
+        self.string_type = string_type
         self.simplified_chinese = simplified_chinese
         self.default_lang = default_lang
         self.english_us = english_us

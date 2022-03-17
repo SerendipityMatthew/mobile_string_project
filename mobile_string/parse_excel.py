@@ -84,42 +84,31 @@ def parse_excel_file():
                 taileString: TaileString
                 if len(module_id_group) == 1:
                     string_id = module_id_group[0]
+                    module_name: str
                     if string_type_str == "android":
-                        taileString = TaileString("android_app", android_id=string_id,
-                                                  simplified_chinese=chinese_simple_str,
-                                                  default_lang=default_lang_str,
-                                                  english_us=english_us,
-                                                  )
-                        taileString.__dict__.update(language_map)
-                        list.append(taileString)
+                        module_name = "android_app"
                     elif string_type_str == "ios":
-                        taileString = TaileString("ios_app", ios_id=string_id,
-                                                  simplified_chinese=chinese_simple_str,
-                                                  default_lang=default_lang_str,
-                                                  english_us=english_us,
-                                                  )
-                        taileString.__dict__.update(language_map)
-                        list.append(taileString)
+                        module_name = "ios_app"
+
+                    taileString = TaileString(module_name, string_id=string_id, string_type=string_type_str,
+                                              simplified_chinese=chinese_simple_str,
+                                              default_lang=default_lang_str,
+                                              english_us=english_us,
+                                              )
+                    taileString.__dict__.update(language_map)
+                    list.append(taileString)
                 elif len(module_id_group) == 2:
 
                     string_module = module_id_group[0]
                     string_id = module_id_group[1]
-                    if string_type_str == "android":
-                        taileString = TaileString(string_module, android_id=string_id,
-                                                  simplified_chinese=chinese_simple_str,
-                                                  default_lang=default_lang_str,
-                                                  english_us=english_us,
-                                                  )
-                        taileString.__dict__.update(language_map)
-                        list.append(taileString)
-                    elif string_type_str == "ios":
-                        taileString = TaileString(string_module, ios_id=string_id,
-                                                  simplified_chinese=chinese_simple_str,
-                                                  default_lang=default_lang_str,
-                                                  english_us=english_us,
-                                                  )
-                        taileString.__dict__.update(language_map)
-                        list.append(taileString)
+                    taileString = TaileString(string_module, string_id=string_id,
+                                              string_type=string_type_str,
+                                              simplified_chinese=chinese_simple_str,
+                                              default_lang=default_lang_str,
+                                              english_us=english_us,
+                                              )
+                    taileString.__dict__.update(language_map)
+                    list.append(taileString)
 
     return list
 
@@ -150,14 +139,10 @@ def get_mobile_string_by_type(string_list: list, string_type: str) -> list:
     print("module_name_list_a = string_type = ", string_type)
 
     temp_module_name_list = []
-    if str(string_type) == "android":
-        for string in string_list:
-            if str(string.android_id) != "":
-                temp_module_name_list.append(string)
-    elif str(string_type) == "ios":
-        for string in string_list:
-            if str(string.ios_id) != "":
-                temp_module_name_list.append(string)
+    for string in string_list:
+        if str(string.string_id) != "" and string.string_type == string_type:
+            temp_module_name_list.append(string)
+
     module_name_list_a = list(set(temp_module_name_list))
     print("module_name_list_a = len(module_name_list_a) = ", len(module_name_list_a))
     return module_name_list_a
@@ -204,7 +189,7 @@ def generate_module_string_to_ios_file(module_name, module_string_list, xml_file
             if taile_string.module_name == module_name:
                 # 获取需要需要的属性对应的语言字符串
                 try:
-                    string_dict[taile_string.ios_id] = getattr(taile_string, language_key)
+                    string_dict[taile_string.string_id] = getattr(taile_string, language_key)
                 except AttributeError:
                     print("there is no attribute %s for object %s = " % (language_key, taile_string))
 
@@ -249,7 +234,7 @@ def generate_module_string_to_xml(module_name, module_string_list, xml_file_name
             if taile_string.module_name == module_name:
                 # 获取需要需要的属性对应的语言字符串
                 try:
-                    string_dict[taile_string.android_id] = getattr(taile_string, language_key)
+                    string_dict[taile_string.string_id] = getattr(taile_string, language_key)
                 except AttributeError:
                     print("there is no attribute %s for object %s = " % (language_key, taile_string))
         all_language_dict[language_key] = string_dict
