@@ -1,30 +1,17 @@
 class TaileString:
     def __init__(self, module_name: str,
                  simplified_chinese: str, string_type=str,
-                 english_us="",
-                 page_start="", isStringArray=False, android_src_path="", ios_module="",
-                 string_id="", function_desc="",
-                 default_lang="", ios_id="",
-                 spanish="", french="", russia="",
-                 korean="", japan="", germany="", **languages):
+                 android_src_path="",
+                 string_id="",
+                 default_lang="",
+                 **languages):
         self.module_name = module_name
-        self.ios_module = ios_module
         self.android_src_path = android_src_path
-        self.page_start = page_start
-        self.function_desc = function_desc
-        self.isStringArray = isStringArray
         self.string_id = string_id
         #  字符串的类型，Android，或者是 iOS 字符串，
         self.string_type = string_type
         self.simplified_chinese = simplified_chinese
         self.default_lang = default_lang
-        self.english_us = english_us
-        self.spanish = spanish
-        self.germany = germany
-        self.french = french
-        self.russia = russia
-        self.korean = korean
-        self.japan = japan
         self.__dict__.update(languages)
 
     def __str__(self):
