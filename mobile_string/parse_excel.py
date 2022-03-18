@@ -145,6 +145,9 @@ def get_mobile_string_by_type(string_list: list, string_type: str) -> list:
 
     module_name_list_a = list(set(temp_module_name_list))
     print("module_name_list_a = len(module_name_list_a) = ", len(module_name_list_a))
+    #  按照 string_id ID 排序的方式，这样可以对比每次的不同的了
+    module_name_list_a.sort(key=lambda mobile_string: mobile_string.string_id, reverse=False)
+
     return module_name_list_a
 
 
