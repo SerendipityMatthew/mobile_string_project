@@ -77,6 +77,10 @@ def get_all_module_name():
     根据目录获取该项目的所有的项目
     :return:
     """
+    if ios_app_project_path == "":
+        print("如果不解析 ios 库, 那么 ios 库路径设置为空")
+        return []
+
     string_dir = os.listdir(ios_app_project_path)
     list_a = []
     for dir1 in string_dir:

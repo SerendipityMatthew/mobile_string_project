@@ -12,7 +12,6 @@ def get_merged_string_dict() -> dict:
     :return:
     """
     android_string_dict = get_android_string_dict_by_identity_key()
-    ios_string_list = get_ios_string_dict_by_identity_key()
     merged_string_dict = dict()
 
     for android_string_key in android_string_dict:
@@ -35,6 +34,7 @@ def get_merged_string_dict() -> dict:
             """
             merged_string_dict[content] = same_key_string_list
 
+    ios_string_list = get_ios_string_dict_by_identity_key()
     for ios_string_key in ios_string_list:
         """
            遍历 iOS 的字符串
