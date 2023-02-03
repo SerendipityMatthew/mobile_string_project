@@ -79,6 +79,9 @@ def get_all_module_name():
     根据目录获取该项目的所有的项目
     :return:
     """
+    if android_app_project_path == "":
+        print("如果不解析 android 库, 那么 android 库路径设置为空")
+        return []
     string_dir = os.listdir(android_app_project_path)
     list_a = []
     for dir1 in string_dir:
